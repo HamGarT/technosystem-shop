@@ -1,0 +1,10 @@
+php artisan make:model Product -mc
+php artisan make:controller ControllerName
+
+
+docker run --name technosystem-shop \
+  -e POSTGRES_USER=techuser \
+  -e POSTGRES_PASSWORD=techuser123 \
+  -e POSTGRES_DB=technosystemdb \
+  -p 5432:5432 \
+  -d postgres:15
