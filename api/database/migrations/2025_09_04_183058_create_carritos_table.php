@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('carritos', function (Blueprint $table) {
             $table->id();
-            $table -> foreignId('usuario_id') -> constrained() -> onDelete('cascade');
-            $
+            $table -> foreignId('usuario_id') -> constrained('users') -> onDelete('cascade');
+            $table -> decimal('precio_total', 10, 2);
             $table->timestamps();
         });
     }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table -> date('fecha_pedido');
             $table -> text('observaciones');
             $table -> string('direccion_entrega');
-            $table -> foreingId('usuario_id')-> constrained('users')->onDelete('cascade');
+            $table -> foreignId('usuario_id')-> constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

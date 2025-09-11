@@ -11,5 +11,6 @@ class Categoria extends Model
 
 class CategoriaResponse
 {
+    use HasFactory;
 
 }

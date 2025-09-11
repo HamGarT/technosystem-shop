@@ -1,5 +1,8 @@
 php artisan make:model Product -mc
 php artisan make:controller ControllerName
+php artisan migrate
+php artisan migrate:fresh
+
 
 
 docker run --name technosystem-shop \

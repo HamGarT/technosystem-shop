@@ -2,36 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Producto extends Model
 {
     
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'sku',
-        'category_id',
-        'stock_quantity',
-        'is_active',
-        'image_url',
-        'weight',
-        'dimensions',
-        'meta_title',
-        'meta_description',
+        'nombre',
+        'descripcion',
+        'precio',
+        'stock',
+        'categoria_id',
+        'estado',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'weight' => 'decimal:2',
-        'is_active' => 'boolean',
-        'dimensions' => 'array',
-        'created_at' => 'datetime',
+        'precio' => 'decimal:2',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 }
 

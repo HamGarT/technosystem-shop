@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('reseñas', function (Blueprint $table) {
             $table->id();
+            $table ->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
+            $table -> text('comentario');
+            $table -> foreignId('producto_id')->constrained('productos')->onDelete('cascade');
+            $table -> index('usuario_id');
             $table->timestamps();
         });
     }
