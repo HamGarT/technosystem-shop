@@ -8,17 +8,18 @@ class StoreProductoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     public function rules(): array
     {
         return [
             "nombre"=> "required|string|max:255",
+            "marca"=> "required|string",
             "descripcion"=> "nullable|string",
             "precio"=> "required|numeric|min:0",
-            "stock"=> "required|integer|min:0º",
-            "categria_id"=> "exists:categorias,id",
+            "stock"=> "required|integer|min:0",
+            "category_id"=> "exists:categorias,id",
             "estado"=>"boolean"
         ];
     }
