@@ -16,6 +16,8 @@ return new class extends Migration
             $table -> string('estado')->default('pendiente');
             $table -> decimal('precio_total', 10, 2);
             $table -> integer('cantidad_productos')->default(0);
+            $table -> string('departamento')->nullable();
+            $table -> string('provincian')->nullable();
             $table -> date('fecha_pedido');
             $table -> text('observaciones');
             $table -> string('direccion_entrega');
@@ -25,7 +27,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Reverse the migrations.  
      */
     public function down(): void
     {
