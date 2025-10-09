@@ -4,9 +4,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductoRequest;
 use App\Http\Resources\ProductoResource;
-use Illuminate\Http\Request;
 use App\Models\Producto;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 class ProductoController extends Controller
 {
 
@@ -14,7 +15,7 @@ class ProductoController extends Controller
 
     public function index()
     {
-        $productos = Producto::paginate(15); // 15 items per page
+        $productos = Producto::paginate(15); // 15 items                   
         return ProductoResource::collection($productos);
     }
 
@@ -26,12 +27,17 @@ class ProductoController extends Controller
         }
         return response()->json(['message' => 'Product not found'], 404);
     }
-    public function create(StoreProductoRequest $request)
-    {
 
+    public function store(StoreProductoRequest $request)
+    {
         try {
             $data = $request->validated();
             $producto = Producto::create($data);
+
+            $photoUrl = $this->handleProductPhotoUpload($request, $producto->id);
+            if ($photoUrl) {
+                $producto->update(['image_url' => $photoUrl]);
+            }
 
             return (new ProductoResource($producto))
                 ->response()
@@ -46,4 +52,27 @@ class ProductoController extends Controller
             ], 500);
         }
     }
+
+    private function handleProductPhotoUpload(Request $request, $productId)
+    {
+        if (!$request->hasFile('image')) {
+            return null;
+        }
+        
+        $request->validate([
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:4048',
+        ]);
+
+        $uuid = \Str::uuid();
+        $extension = $request->file('image')->getClientOriginalExtension();
+        $filename = $uuid . '.' . $extension;
+
+        $path = $request->file('image')->storeAs(
+            "product_images/{$productId}",
+            $filename,
+            'public'
+        );
+        return Storage::url($path); ;
+    }
+
 }

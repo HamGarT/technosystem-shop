@@ -7,6 +7,8 @@ use Psy\Output\ProcOutputPager;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-Route::get('/products', [ProductoController::class, 'index']);
-Route::post('/products/create', [ProductoController::class,'create']);
-Route::get('/products/{id}', [ProductoController::class,'show']);
+
+// Route::post('/products', [ProductoController::class,'create']);
+// Route::get('/products', [ProductoController::class, 'index']);
+// Route::get('/products/{id}', [ProductoController::class,'show']);
+

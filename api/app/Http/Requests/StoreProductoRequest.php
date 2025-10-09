@@ -15,6 +15,7 @@ class StoreProductoRequest extends FormRequest
     {
         return [
             "nombre"=> "required|string|max:255",
+            "image" => 'nullable|image|mimes:jpg,jpeg,png|max:4048',
             "marca"=> "required|string",
             "descripcion"=> "nullable|string",
             "precio"=> "required|numeric|min:0",

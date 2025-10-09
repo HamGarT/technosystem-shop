@@ -1,6 +1,8 @@
 php artisan make:model Product -mc
 php artisan make:controller ControllerName
+php artisan make:resource 
 php artisan migrate
+php artisan migrate:refresh
 php artisan migrate:fresh
 
 

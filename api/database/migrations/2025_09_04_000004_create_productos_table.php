@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table ->string('nombre');
             $table-> text('descripcion') -> nullable();
+            $table->string('image_url')->nullable();
             $table-> decimal('precio', 10,2);
             $table -> integer('stock') -> default(0);
             $table -> string('marca');
