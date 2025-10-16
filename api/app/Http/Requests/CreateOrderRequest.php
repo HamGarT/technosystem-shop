@@ -11,7 +11,7 @@ class CreateOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -25,7 +25,7 @@ class CreateOrderRequest extends FormRequest
             "departamento" => "required|string",
             "provincia" => "required|string",
             "direccion" => "required|string",
-            "usuario_id" => "required|exists:users,id", // Added 'required'
+            "usuario_id" => "required|exists:users,id",
             "pedido_items" => "required|array|min:1",
             "pedido_items.*.producto_id" => "required|exists:productos,id",
             "pedido_items.*.cantidad" => "required|integer|min:1",

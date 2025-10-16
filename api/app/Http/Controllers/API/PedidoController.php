@@ -1,20 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\API;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderRequest;
 use App\Http\Resources\PedidoResource;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
 use App\Models\Producto;
 use Date;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use function PHPUnit\Framework\returnArgument;
 
 class PedidoController extends Controller
 {
     //
     public function index(){
-
+        $pedidos = Pedido::paginate(15);
+        return PedidoResource::collection($pedidos);
     }
     public function store(CreateOrderRequest $request){
         $total_price = 0;
@@ -23,10 +26,10 @@ class PedidoController extends Controller
     
         $pedido = Pedido::create([
             "estado" => "pendiente",
-            "fecha_pedido" => now(), // Use now() helper instead of Date::now()
+            "fecha_pedido" => now(), 
             "departamento" => $data["departamento"],
-            "provincia" => $data["provincia"],
-            "direccion" => $data["direccion"],
+            "provincian" => $data["provincia"],
+            "direccion_entrega" => $data["direccion"],
             "usuario_id" => $data["usuario_id"],
         ]);
         
@@ -52,5 +55,17 @@ class PedidoController extends Controller
             ->setStatusCode(201);
     }
 
-    public function show($id){}
+    public function show($id){
+        try{
+            $pedido = Pedido::findOrFail($id);
+            return (new PedidoResource($pedido))
+                    ->response()
+                    ->setStatusCode(201);
+
+        }catch(ModelNotFoundException){
+            return response()->json([
+                'message' => 'Product not found'
+            ], 404); 
+        }
+    }
 }
