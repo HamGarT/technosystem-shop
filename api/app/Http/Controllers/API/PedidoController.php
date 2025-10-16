@@ -28,7 +28,7 @@ class PedidoController extends Controller
             "estado" => "pendiente",
             "fecha_pedido" => now(), 
             "departamento" => $data["departamento"],
-            "provincian" => $data["provincia"],
+            "provincia" => $data["provincia"],
             "direccion_entrega" => $data["direccion"],
             "usuario_id" => $data["usuario_id"],
         ]);

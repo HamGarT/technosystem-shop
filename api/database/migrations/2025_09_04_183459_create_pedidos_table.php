@@ -17,7 +17,7 @@ return new class extends Migration
             $table -> decimal('precio_total', 10, 2)->nullable();
             $table -> integer('cantidad_productos')->default(0);
             $table -> string('departamento')->nullable();
-            $table -> string('provincian')->nullable();
+            $table -> string('provincia')->nullable();
             $table -> date('fecha_pedido');
             $table -> text('observaciones')->nullable();
             $table -> string('direccion_entrega');
