@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
             $table -> string('estado')->default('pendiente');
-            $table -> decimal('precio_total', 10, 2);
+            $table -> decimal('precio_total', 10, 2)->nullable();
             $table -> integer('cantidad_productos')->default(0);
             $table -> string('departamento')->nullable();
             $table -> string('provincian')->nullable();
             $table -> date('fecha_pedido');
-            $table -> text('observaciones');
+            $table -> text('observaciones')->nullable();
             $table -> string('direccion_entrega');
             $table -> foreignId('usuario_id')-> constrained('users')->onDelete('cascade');
             $table->timestamps();

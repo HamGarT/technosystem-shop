@@ -7,6 +7,7 @@ use App\Http\Resources\ProductoResource;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductoController extends Controller
 {
@@ -53,6 +54,54 @@ class ProductoController extends Controller
         }
     }
 
+
+public function delete($id){
+    try{
+        $producto = Producto::findOrFail($id);
+        $producto->delete();
+        return response()->json([
+            'message'=> 'Product successfully deleted'
+        ]);
+        
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'message' => 'Product not found'
+        ], 404);
+    } catch (\Exception $e){
+        return response()->json([
+            'message' => 'Failed to delete product',
+            'error' => 'Internal server error'
+        ], 500);
+    }
+}
+
+public function update($id, StoreProductoRequest $request){
+    try{
+        
+        $data = $request->validated();
+        $producto = Producto::findOrFail($id);
+        $producto->update($data);
+        $photoUrl = $this->handleProductPhotoUpload($request, $producto->id);
+        if ($photoUrl) {
+            $producto->update(['image_url'=> $photoUrl]);
+        }
+        return (new ProductoResource($producto))
+            ->response()
+            ->setStatusCode(200);
+            
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'message' => 'Product not found'
+        ], 404);
+    } catch (\Exception $e){
+        return response()->json([
+            'message' => 'Failed to update product',
+            'error' => 'Internal server error'
+        ], 500);
+    }
+}
+
+
     private function handleProductPhotoUpload(Request $request, $productId)
     {
         if (!$request->hasFile('image')) {
@@ -75,4 +124,5 @@ class ProductoController extends Controller
         return Storage::url($path); ;
     }
 
+  
 }

@@ -8,8 +8,11 @@ class Pedido extends Model
 {
     protected $fillable = [
         "estado",
-        "precio_total",
         "cantidad_productos",
-        "fecha_pedido"
+        "fecha_pedido",
+        "departamento",
+        "provincian",
+        "usuario_id",
+        "direccion_entrega"
     ] ;
 }
