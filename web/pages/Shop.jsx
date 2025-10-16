@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react';
+import TiendaLista from '../components/Tienda/TiendaLista';
 
 const Shop = () => {
-  return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold">Tienda</h1>
-      <p className="mt-4 text-gray-600">Listado de productos (componente Shop).</p>
-    </div>
-  )
-}
 
-export default Shop
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TiendaLista />
+    </div>
+  );
+};
+
+export default Shop;
