@@ -26,7 +26,8 @@ class CategoriaController extends Controller
         }catch(Exception $e){
             return response()->json([
                 'message' => 'Failed to create category',
-                'error' => 'Internal server error'
+                'error' => 'Internal server error niooooo',
+                "log" => $e->getMessage()
             ], 500);
         }
     }
