@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+
 import TiendaLista from '../components/Tienda/TiendaLista';
 
 const Shop = () => {

@@ -4,6 +4,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css/pagination';
 import ProductCard from '../components/ProductCard';
 import ProductCarousel from '../components/ProductCarousel';
+import ProductGrid from '../components/ProductGrid';
 
 class Home extends React.Component {
     render() {
@@ -101,8 +102,11 @@ class Home extends React.Component {
                                 </svg>
                             </div>
                             <h3 className="font-semibold">DISCOS</h3>
-                        </div>
+                        </div>                   
+                        
                     </div>
+                    {/* Sección de productos completa */}
+                    <ProductGrid />
                 </div>
             </div>
         </div>
