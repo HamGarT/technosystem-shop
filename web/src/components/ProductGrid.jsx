@@ -1,4 +1,6 @@
-import ProductCard from './ProductCard'; 
+import { useEffect, useState } from 'react';
+import ProductCard from './ProductCard';
+import axios from 'axios';
 
 const products = [
   { id: 1, title: 'TARJETA DE VIDEO GIGABYTE GEFORCE RTX 5060 8GB AERO OC DDR7', price: '2050', image: 'https://i.imgur.com/v2FcB2s.png' },
@@ -10,6 +12,17 @@ const products = [
 ];
 
 const ProductGrid = () => {
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    axios.get('https://technosystem-shop-production.up.railway.app/api/products')
+      .then((response) => {
+        console.log(response)
+        setProducts(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+  }, []);
   return (
     <section className="py-16 bg-white">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -17,7 +30,7 @@ const ProductGrid = () => {
           NUEVOS PRODUCTOS
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
+          {products.slice(0, 8).map((product) => (
             <div key={product.id} className="h-full">
               <ProductCard product={product} />
             </div>
