@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductoRequest;
 use App\Http\Resources\ProductoResource;
+use App\Models\Categoria;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,13 +17,13 @@ class ProductoController extends Controller
 
     public function index()
     {
-        $productos = Producto::paginate(15); // 15 items                   
+        $productos = Producto::with('categoria')->paginate(15);                
         return ProductoResource::collection($productos);
     }
 
     public function show($id)
-    {
-        $producto = Producto::find($id);
+    { 
+        $producto = Producto::with('categoria')->find($id);
         if ($producto) {
             return new ProductoResource($producto);
         }

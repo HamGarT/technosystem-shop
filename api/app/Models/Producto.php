@@ -26,6 +26,10 @@ class Producto extends Model
         'precio' => 'decimal:2',
         'updated_at' => 'datetime',
     ];
+
+    public function categoria(){
+        return $this->belongsTo(Categoria::class, 'category_id');
+    }
 }
 
 
