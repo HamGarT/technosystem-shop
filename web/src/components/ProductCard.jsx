@@ -3,9 +3,9 @@ import { FiHeart, FiShoppingCart, FiEye } from 'react-icons/fi';
 
 const ProductCard = ({ product }) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 text-left h-full flex flex-col">
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 text-left h-[438px] w-[288px] flex flex-col">
       <div className="flex justify-between items-center mb-3">
-        <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded">
+        <span className="bg-gray-100 text-gray-600  text-[20px] px-2.5 py-1 rounded">
           GRÁFICA
         </span>
         <div className="flex items-center space-x-2 text-gray-400">
@@ -15,16 +15,16 @@ const ProductCard = ({ product }) => {
       </div>
       <div className="flex-shrink-0 my-4 h-40 flex items-center justify-center">
         <img 
-          src={product.image} 
+          src="https://www.digitalcombatsimulator.com/upload/iblock/445/zgwp40uxl1b5tylmiu2n06wvgpsfaiud/DCS_2022-08-23_22-44-24.jpg" 
           alt={product.title} 
-          className="max-h-full max-w-full object-contain" 
+          className="max-w-full object-contain rounded-[10px]" 
         />
       </div>
-      <h3 className="text-sm font-semibold text-gray-800 flex-grow mb-4 leading-tight">
+      <h3 className="text-[22px] flex-grow mb-4 leading-tight">
         {product.title}
       </h3>
       <div className="flex justify-between items-center mt-auto">
-        <span className="text-xl font-bold text-gray-900">
+        <span className="text-[32px]">
           S/. {product.price}
         </span>
         <button className="text-gray-600 hover:text-blue-600 transition-colors">

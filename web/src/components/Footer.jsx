@@ -1,15 +1,15 @@
 import { FaFacebookF, FaYoutube, FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa';
 import { FiArrowUp, FiPlus } from 'react-icons/fi';
-import Visa from '../public/images/visa.png';
-import Card from '../public/images/card.png';
-import Yape from '../public/images/yape.png';
-import Diners from '../public/images/diners-club.png';
+import Visa from "@/assets/images/visa.png";
+import Card from "@/assets/images/card.png";
+import Yape from "@/assets/images/Yape.png";
+import Diners from "@/assets/images/diners-club.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200 pt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 text-sm">
+    <footer className="bg-white border-t border-gray-200 pt-12 text-[18px]">
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <h3 className="font-bold text-blue-800 tracking-wider">ACERCA DE NOSOTROS</h3>
             <ul className="space-y-3 text-gray-600">
@@ -47,17 +47,14 @@ const Footer = () => {
               Central (01) 425 - 191
             </p>
             <p className="pt-4">Esta página permite pagos online con:</p>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 justify-evenly">
                 <img src={Visa} alt="Visa" className="h-10" />
                 <img src={Card} alt="Mastercard" className="h-10" />
                 <img src={Yape} alt="Yape" className="h-10" />
                 <img src={Diners} alt="Diners Club" className="h-10" />
             </div>
           </div>
-          <div className="space-y-4">
-            <h3 className="font-bold text-blue-800 tracking-wider">COLUMNA NUEVA</h3>
-            {/* Puedes agregar contenido aquí */}
-          </div>
+      
         </div>
       </div>
       <div className="mt-12 border-t border-gray-200 py-6">
