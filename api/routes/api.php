@@ -25,6 +25,6 @@ Route::prefix('pedidos')->group(function () {
 Route::prefix('categorias')->group(function () {
     Route::post('/', [CategoriaController::class, 'store']);
     Route::get('/', [CategoriaController::class, 'index']);
+    Route::get('/detailed', [CategoriaController::class, 'detailedIndex']);
 });
-
 

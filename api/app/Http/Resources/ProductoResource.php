@@ -16,7 +16,8 @@ class ProductoResource extends JsonResource
             'descripcion' => $this->descripcion,
             'stock'       => $this->stock,
             'image_url' => $this->image_url,
-            'categoria'   => $this->categoria->nombre ?? null
+            'categoria'   => $this->categoria->nombre ?? null,
+            'marca' => $this->marca
             // 'categoria' => Categoria::find($this->category_id)?->nombre
         ];
 

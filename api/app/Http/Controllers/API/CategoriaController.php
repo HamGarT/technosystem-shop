@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoriaRequest;
-use App\Http\Resources\CategoriaResource;
+use App\Http\Resources\CategoriaDetailedResource;
+use App\Http\Resources\CategoriaSimpleResource;
 use App\Models\Categoria;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,13 +15,18 @@ class CategoriaController extends Controller
 
     public function index(){
         $categorias = Categoria::paginate(15);
-        return CategoriaResource::collection($categorias);
+        return CategoriaSimpleResource::collection($categorias);
+    }
+
+    public function detailedIndex(){
+        $categorias = Categoria::withCount('products')->paginate(15);
+    return CategoriaDetailedResource::collection($categorias);
     }
     public function store(StoreCategoriaRequest $request){
         try{
             $data = $request->validated();
             $categoria = Categoria::create($data);
-            return (new CategoriaResource($categoria))
+            return (new CategoriaSimpleResource($categoria))
                     ->response()
                     ->setStatusCode(201);
         }catch(Exception $e){
