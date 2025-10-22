@@ -11,8 +11,7 @@ import {
   SidebarGroupLabel
 } from "@/components/ui/sidebar"
 import { Package, Tags, ShoppingCart, Settings } from "lucide-react"
-import { Link, useLocation } from "react-router-dom"
-import { useState } from "react"
+import { Link} from "react-router-dom"
 import { NavUser } from "./nav-user"
 import { ThemeToggle } from "./theme-toggle"
 import { Store } from "lucide-react"
