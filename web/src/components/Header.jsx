@@ -62,7 +62,9 @@ export const Header = () => {
               <FiUser size={26} />
             </button>
             <button className="hover:text-gray-200">
-              <FiShoppingCart size={26} />
+              <Link to="/cart" className="inline-flex items-center">
+                <FiShoppingCart size={26} />
+              </Link>
             </button>
           </div>
         </div>
