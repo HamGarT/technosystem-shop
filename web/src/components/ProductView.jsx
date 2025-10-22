@@ -10,6 +10,7 @@ import { useCart } from '../contexts/useCart';
 import { FiShoppingCart, FiPlus, FiMinus } from 'react-icons/fi';
 
 const ProductView = () => {
+  const apiUrl =  import.meta.env.VITE_API_URL;
   const { id } = useParams(); // Obtiene el 'id' de la URL, ej: /product/5
   const { addItem } = useCart();
   
@@ -27,13 +28,9 @@ const ProductView = () => {
       setError(null);
       
       try {
-        // 1. Obtener el producto principal usando el ID de la URL
-        const productResponse = await axios.get(`https://technosystem-shop-production.up.railway.app/api/products/${id}`);
+        const productResponse = await axios.get(`${apiUrl}/api/products/${id}`);
         setProduct(productResponse.data.data);
-
-        // 2. Obtener todos los productos para la sección "Relacionados"
-        const relatedResponse = await axios.get('https://technosystem-shop-production.up.railway.app/api/products');
-        // Filtramos para no mostrar el producto actual en la lista de relacionados
+        const relatedResponse = await axios.get(`${apiUrl}/api/products`);
         const filteredRelated = relatedResponse.data.data.filter(p => p.id !== parseInt(id));
         setRelatedProducts(filteredRelated);
 
@@ -41,12 +38,12 @@ const ProductView = () => {
         setError("No se pudo cargar el producto. Por favor, intente de nuevo más tarde.");
         console.error("Error fetching product data:", err);
       } finally {
-        setLoading(false); // Termina la carga
+        setLoading(false); 
       }
     };
 
     fetchProductData();
-  }, [id]); // El efecto se ejecuta cada vez que el 'id' de la URL cambia
+  }, [id]);
 
   const handleQuantityChange = (amount) => {
     setQuantity(prev => Math.max(1, prev + amount));

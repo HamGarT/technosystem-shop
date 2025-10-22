@@ -1,13 +1,41 @@
 // web/src/pages/Cart.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/useCart';
 import CartItem from '../components/CartItem';
+import axios from 'axios';
 
 const currencyFormat = (v) => Number(v).toFixed(2);
 
 export default function Cart() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { cart, updateQuantity, removeItem, clearCart } = useCart();
+  const [order, setOrder] = useState({
+    departamento: "Lima",
+    provincia: "Lima",
+    direccion: "Av. Arequipa 1234, Miraflores",
+    usuario_id: 1,
+    pedido_items: []
+  })
+
+  useEffect(() => {
+    const pedido_items = cart.map(item => ({
+      producto_id: item.product.id,
+      cantidad: item.quantity
+    }));
+    setOrder(prev => ({
+      ...prev,           
+      pedido_items    
+    }));
+
+    console.log(pedido_items);
+    console.log(order);
+  }, [cart]);
+
+  useEffect(() => {
+    console.log("Order (after update):", order);
+  }, [order]);
+
 
   const totals = cart.reduce((s, it) => {
     const price = Number(it.product?.precio || it.product?.price || 0);
@@ -17,9 +45,9 @@ export default function Cart() {
   }, { items: 0, subtotal: 0 });
 
   const handleCheckout = () => {
-    // placeholder: redirigir al checkout o procesar la compra
-    // Aquí podrías verificar login, enviar al endpoint de orden, etc.
+    axios.post(`${apiUrl}/api/pedidos`, order);
     alert('Checkout: total S/. ' + currencyFormat(totals.subtotal));
+    
     // ejemplo de redirección:
     // navigate('/checkout');
   };

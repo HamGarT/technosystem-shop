@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 const TiendaLista = () => {
-
+  const apiUrl =  import.meta.env.VITE_API_URL;
   const [filters, setFilters] = useState({
     category: '',
     priceRange: '',
@@ -13,7 +13,7 @@ const TiendaLista = () => {
   const [products, setProducts] = useState([]);
   
     useEffect(() => {
-      axios.get('https://technosystem-shop-production.up.railway.app/api/products')
+      axios.get(`${apiUrl}/api/products`)
         .then((response) => {
           console.log(response)
           setProducts(response.data.data);

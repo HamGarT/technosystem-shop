@@ -19,15 +19,14 @@ interface Product {
 }
 
 export function Products() {
-  const [products, setProducts] = useState<Product[]>([
-
-  ])
+  const apiUrl =  import.meta.env.VITE_API_URL;
+  const [products, setProducts] = useState<Product[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(()=>{
-    axios.get("http://127.0.0.1:8000/api/products")
+    axios.get(`${apiUrl}/api/products`)
     .then((respone)=>{
       setProducts(respone.data.data);
       console.log(respone.data.data)
@@ -50,7 +49,7 @@ export function Products() {
       setProducts(products.map((p) => (p.id === editingId ? { ...product, id: editingId } : p)))
       setEditingId(null)
     } else {
-      axios.post("http://127.0.0.1:8000/api/products", product)
+      axios.post(`${apiUrl}/api/products`, product)
         .catch(e => {
           console.log("error al guarda producto", e)
         });

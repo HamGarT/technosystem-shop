@@ -16,6 +16,7 @@ interface Category {
 }
 
 export function Categories() {
+  const apiUrl =  import.meta.env.VITE_API_URL;
   const [categories, setCategories] = useState<Category[]>([])
   const [newCategory, setNewCategory] = useState("")
   const [newDescription, setNewDescription] = useState("")
@@ -33,7 +34,7 @@ export function Categories() {
   }
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/categorias/detailed")
+    axios.get(`${apiUrl}/api/categorias/detailed`)
       .then((response) => {
         console.log(response.data)
         setCategories(response.data.data)
@@ -59,7 +60,7 @@ export function Categories() {
         products_count: 0,
       }
 
-      axios.post("http://127.0.0.1:8000/api/categorias", categoria)
+      axios.post(`${apiUrl}/api/categorias`, categoria)
       .catch(e => {
         console.log("La categoria no se pudo registrar", e)
       })

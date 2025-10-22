@@ -4,9 +4,10 @@ import axios from 'axios';
 import { Link } from 'react-router-dom'; // <-- 1. Importa Link
 
 const ProductGrid = () => {
+  const apiUrl =  import.meta.env.VITE_API_URL;
   const [products, setProducts] = useState([]);
   useEffect(() => {
-    axios.get('https://technosystem-shop-production.up.railway.app/api/products')
+    axios.get(`${apiUrl}/api/products`)
       .then((response) => {
         console.log(response)
         setProducts(response.data.data);
