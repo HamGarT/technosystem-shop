@@ -24,7 +24,7 @@ interface Order {
 }
 
 export function Orders() {
-  const apiUrl =  import.meta.env.VITE_API_URL;
+  //const apiUrl =  import.meta.env.VITE_API_URL;
   const [orders, setOrders] = useState<Order[]>([
     {
       id: "#001",

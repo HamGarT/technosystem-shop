@@ -3,7 +3,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
@@ -14,7 +13,6 @@ import {
 import { Package, Tags, ShoppingCart, Settings } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { NavUser } from "./nav-user"
 import { ThemeToggle } from "./theme-toggle"
 import { Store } from "lucide-react"
@@ -47,8 +45,6 @@ const settingsItems = [
 ]
 
 export function AppSidebar({...props}) {
-  const location = useLocation()
-  const [isOpen, setIsOpen] = useState(true)
   const userData = {
     name: "Pedro",
     email: "pedro@gmail.com",
