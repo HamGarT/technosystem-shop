@@ -114,12 +114,12 @@ export function Orders() {
     }
   }
 
-  const upfecha_pedidoOrderStatus = (orderId: string, newStatus: Order["estado"]) => {
-    setOrders(orders.map((o) => (o.id === orderId ? { ...o, estado: newStatus } : o)))
-    if (selectedOrder?.id === orderId) {
-      setSelectedOrder({ ...selectedOrder, estado: newStatus })
-    }
-  }
+  // const upfecha_pedidoOrderStatus = (orderId: string, newStatus: Order["estado"]) => {
+  //   setOrders(orders.map((o) => (o.id === orderId ? { ...o, estado: newStatus } : o)))
+  //   if (selectedOrder?.id === orderId) {
+  //     setSelectedOrder({ ...selectedOrder, estado: newStatus })
+  //   }
+  // }
 
   return (
     <div className="p-8">
