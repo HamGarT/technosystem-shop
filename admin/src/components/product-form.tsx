@@ -25,6 +25,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ onSave, onCancel, editingId, initialData }: ProductFormProps) {
+  const apiUrl =  import.meta.env.VITE_API_URL;
   const [categories, setCategories] = useState<SimpleCategory[]>([]);
   const [formData, setFormData] = useState(
     initialData || {
@@ -41,7 +42,7 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/categorias")
+    axios.get(`${apiUrl}/api/categorias`)
       .then((response) => {
         setCategories(response.data.data)
         console.log(response)
@@ -104,7 +105,10 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
             </div>
             <div>
               <label>Categorías</label>
-              <Select onValueChange={(value) => setFormData({...formData, category_id: value})}>
+              <Select 
+                onValueChange={(value) => setFormData({...formData, category_id: value})}
+                value={categories.find((item) => item.nombre === initialData.categoria)?.id.toString() || ""}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
@@ -143,7 +147,10 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
             </div>
             <div>
               <label className="text-sm font-medium">Estado</label>
-              <Select onValueChange={(value) => setFormData({...formData, estado: value})}>
+              <Select 
+                onValueChange={(value) => setFormData({...formData, estado: value})}
+                value={formData.estado? "0" : "1"}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona un estado" />
                 </SelectTrigger>

@@ -16,9 +16,9 @@ interface Order {
   id: string
   customer: string
   email: string
-  total: number
-  status: "pending" | "processing" | "completed" | "cancelled"
-  date: string
+  precio_total: number
+  estado: "pending" | "processing" | "completed" | "cancelled"
+  fecha_pedido: string
   items: OrderItem[]
   shippingAddress: string
 }
@@ -30,9 +30,9 @@ export function Orders() {
       id: "#001",
       customer: "Juan García",
       email: "juan@example.com",
-      total: 299.99,
-      status: "completed",
-      date: "2025-01-20",
+      precio_total: 299.99,
+      estado: "completed",
+      fecha_pedido: "2025-01-20",
       items: [{ productName: "Laptop Pro", quantity: 1, price: 299.99 }],
       shippingAddress: "Calle Principal 123, Madrid",
     },
@@ -40,9 +40,9 @@ export function Orders() {
       id: "#002",
       customer: "María López",
       email: "maria@example.com",
-      total: 149.5,
-      status: "processing",
-      date: "2025-01-20",
+      precio_total: 149.5,
+      estado: "processing",
+      fecha_pedido: "2025-01-20",
       items: [
         { productName: "Mouse Inalámbrico", quantity: 2, price: 29 },
         { productName: "Teclado Mecánico", quantity: 1, price: 89.5 },
@@ -53,9 +53,9 @@ export function Orders() {
       id: "#003",
       customer: "Carlos Rodríguez",
       email: "carlos@example.com",
-      total: 599.99,
-      status: "pending",
-      date: "2025-01-19",
+      precio_total: 599.99,
+      estado: "pending",
+      fecha_pedido: "2025-01-19",
       items: [{ productName: "Monitor 4K", quantity: 1, price: 599.99 }],
       shippingAddress: "Plaza Mayor 789, Valencia",
     },
@@ -63,28 +63,28 @@ export function Orders() {
       id: "#004",
       customer: "Ana Martínez",
       email: "ana@example.com",
-      total: 89.99,
-      status: "completed",
-      date: "2025-01-19",
+      precio_total: 89.99,
+      estado: "completed",
+      fecha_pedido: "2025-01-19",
       items: [{ productName: "Webcam HD", quantity: 1, price: 89.99 }],
       shippingAddress: "Calle Secundaria 321, Sevilla",
     },
   ])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [estadoFilter, setStatusFilter] = useState<string>("all")
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
       o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       o.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
       o.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || o.status === statusFilter
+    const matchesStatus = estadoFilter === "all" || o.estado === estadoFilter
     return matchesSearch && matchesStatus
   })
 
-  const getStatusIcon = (status: Order["status"]) => {
-    switch (status) {
+  const getStatusIcon = (estado: Order["estado"]) => {
+    switch (estado) {
       case "completed":
         return <CheckCircle className="w-4 h-4 text-green-600" />
       case "processing":
@@ -96,18 +96,18 @@ export function Orders() {
     }
   }
 
-  const getStatusLabel = (status: Order["status"]) => {
+  const getStatusLabel = (estado: Order["estado"]) => {
     const labels = {
       completed: "Completado",
       processing: "Procesando",
       pending: "Pendiente",
       cancelled: "Cancelado",
     }
-    return labels[status]
+    return labels[estado]
   }
 
-  const getStatusColor = (status: Order["status"]) => {
-    switch (status) {
+  const getStatusColor = (estado: Order["estado"]) => {
+    switch (estado) {
       case "completed":
         return "bg-green-500/10 text-green-600"
       case "processing":
@@ -119,10 +119,10 @@ export function Orders() {
     }
   }
 
-  const updateOrderStatus = (orderId: string, newStatus: Order["status"]) => {
-    setOrders(orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)))
+  const upfecha_pedidoOrderStatus = (orderId: string, newStatus: Order["estado"]) => {
+    setOrders(orders.map((o) => (o.id === orderId ? { ...o, estado: newStatus } : o)))
     if (selectedOrder?.id === orderId) {
-      setSelectedOrder({ ...selectedOrder, status: newStatus })
+      setSelectedOrder({ ...selectedOrder, estado: newStatus })
     }
   }
 
@@ -145,7 +145,7 @@ export function Orders() {
           />
         </div>
         <select
-          value={statusFilter}
+          value={estadoFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="px-3 py-2 border border-input rounded-md bg-background text-foreground"
         >
@@ -188,13 +188,13 @@ export function Orders() {
                       </div>
                     </td>
                     <td className="py-3 px-4">{order.items.length}</td>
-                    <td className="py-3 px-4 font-semibold">${order.total.toFixed(2)}</td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">{order.date}</td>
+                    <td className="py-3 px-4 font-semibold">${order.precio_total.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-sm text-muted-foreground">{order.fecha_pedido}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        {getStatusIcon(order.status)}
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {getStatusLabel(order.status)}
+                        {getStatusIcon(order.estado)}
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(order.estado)}`}>
+                          {getStatusLabel(order.estado)}
                         </span>
                       </div>
                     </td>
@@ -258,15 +258,15 @@ export function Orders() {
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-semibold">Total:</span>
-                  <span className="text-2xl font-bold">${selectedOrder.total.toFixed(2)}</span>
+                  <span className="text-2xl font-bold">${selectedOrder.precio_total.toFixed(2)}</span>
                 </div>
 
-                {/* Status Update */}
+                {/* Status Upfecha_pedido */}
                 <div>
                   <label className="text-sm font-medium block mb-2">Cambiar Estado</label>
                   <select
-                    value={selectedOrder.status}
-                    onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value as Order["status"])}
+                    value={selectedOrder.estado}
+                    onChange={(e) => upfecha_pedidoOrderStatus(selectedOrder.id, e.target.value as Order["estado"])}
                     className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
                   >
                     <option value="pending">Pendiente</option>

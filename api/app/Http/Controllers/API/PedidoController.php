@@ -16,7 +16,7 @@ class PedidoController extends Controller
 {
     //
     public function index(){
-        $pedidos = Pedido::paginate(15);
+        $pedidos = Pedido::with('usuario')->paginate(15);
         return PedidoResource::collection($pedidos);
     }
     public function store(CreateOrderRequest $request){

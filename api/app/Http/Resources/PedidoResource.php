@@ -20,7 +20,8 @@ class PedidoResource extends JsonResource
             "precio_total" => $this->precio_total,
             "cantidad_productos"=> $this->cantidad_productos,
             "fecha_pedido"=> $this->fecha_pedido,
-            "usuario_id" => $this-> usuario_id,
+            "usuario" => $this->usuario->name,
+            "email" => $this->usuario->email
         ];
     }
 }

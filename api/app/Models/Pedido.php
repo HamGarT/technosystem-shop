@@ -15,4 +15,10 @@ class Pedido extends Model
         "usuario_id",
         "direccion_entrega"
     ] ;
+
+    public function usuario(){
+        return $this->belongsTo(User::class,'usuario_id');
+    }
+
 }
+    

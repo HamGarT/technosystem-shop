@@ -147,10 +147,10 @@ export function Products() {
                     </td>
                     <td className="py-3 px-4">
                       <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${product.estado === "active" ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
+                        className={`px-2 py-1 rounded text-xs font-medium ${product.estado? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
                           }`}
                       >
-                        {product.estado === "active" ? "Activo" : "Inactivo"}
+                        {product.estado  ? "Activo" : "Inactivo"}
                       </span>
                     </td>
                     <td className="py-3 px-4">
