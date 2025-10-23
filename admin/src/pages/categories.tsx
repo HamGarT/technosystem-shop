@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Edit2, Trash2, Package } from "lucide-react"
 import axios from "axios";
+import { toast } from "react-hot-toast"
 
 interface Category {
   id: number
@@ -16,7 +17,7 @@ interface Category {
 }
 
 export function Categories() {
-  const apiUrl =  import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [categories, setCategories] = useState<Category[]>([])
   const [newCategory, setNewCategory] = useState("")
   const [newDescription, setNewDescription] = useState("")
@@ -49,7 +50,7 @@ export function Categories() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (validateForm(newCategory, newDescription)) {
 
       const categoria = {
@@ -59,21 +60,20 @@ export function Categories() {
         slug: generateSlug(newCategory),
         products_count: 0,
       }
-
-      axios.post(`${apiUrl}/api/categorias`, categoria)
-      .catch(e => {
-        console.log("La categoria no se pudo registrar", e)
-      })
-
-      setCategories([
-        ...categories,
-        categoria
-      ])
-      setNewCategory("")
-      setNewDescription("")
-      setErrors({})
-
-
+      try {
+        await axios.post(`${apiUrl}/api/categorias`, categoria);
+        toast.success('¡Categoría registrada!');
+        setCategories([
+          ...categories,
+          categoria
+        ])
+        setNewCategory("")
+        setNewDescription("")
+        setErrors({})
+      } catch (error) {
+        toast.error('Error al registrar la categoría');
+        console.error(error);
+      }
     }
   }
 

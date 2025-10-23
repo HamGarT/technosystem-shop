@@ -1,13 +1,14 @@
 import { Routes, Route } from "react-router-dom"
 import "./App.css"
 import RootLayout from "./pages/layout"
-
+import { Toaster } from 'react-hot-toast';
 export default function App() {
   return (
-    
-        <Routes>
-          <Route path="/*" element={<RootLayout/>}/>
-        </Routes>
-     
-  )
+    <>
+      <Toaster position="top-right" />
+      <Routes>
+        <Route path="/*" element={<RootLayout />} />
+      </Routes>
+    </>
+  );
 }

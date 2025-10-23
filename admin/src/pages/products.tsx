@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Plus, Edit2, Trash2, Search } from "lucide-react"
 import { ProductForm } from "@/components/product-form"
 import axios from "axios"
+import { toast } from "react-hot-toast"
 
 interface Product {
   id: number
@@ -19,43 +20,44 @@ interface Product {
 }
 
 export function Products() {
-  const apiUrl =  import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [products, setProducts] = useState<Product[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
-  useEffect(()=>{
+  useEffect(() => {
     axios.get(`${apiUrl}/api/products`)
-    .then((respone)=>{
-      setProducts(respone.data.data);
-      console.log(respone.data.data)
-    })
+      .then((respone) => {
+        setProducts(respone.data.data);
+        console.log(respone.data.data)
+      })
   }, [])
 
 
 
   const filteredProducts = products.filter(
     (p) =>
-      p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || p.marca.toLowerCase().includes(searchTerm.toLowerCase()),
+      p.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.marca?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const handleDelete = (id: number) => {
     setProducts(products.filter((p) => p.id !== id))
   }
 
-  const handleSave = (product: Omit<Product, "id">) => {
+  const handleSave = async (product: Omit<Product, "id">) => {
     if (editingId) {
       setProducts(products.map((p) => (p.id === editingId ? { ...product, id: editingId } : p)))
       setEditingId(null)
     } else {
-      axios.post(`${apiUrl}/api/products`, product)
-        .catch(e => {
-          console.log("error al guarda producto", e)
-        });
-      alert("Producto registrado correctamente");
-      console.log(product)
-      setProducts([...products, { ...product, id: Math.max(...products.map((p) => p.id), 0) + 1 }])
+      try {
+        const response = await axios.post(`${apiUrl}/api/products`, product);
+        setProducts([...products, response.data.data]);
+        toast.success("Producto registrado correctamente");
+      } catch (error) {
+        toast.error("Error al guardar producto");
+      }
     }
     setShowForm(false)
   }
@@ -110,7 +112,7 @@ export function Products() {
       <Card>
         <CardHeader>
           <CardTitle>Lista de Productos</CardTitle>
-          <CardDescription>{filteredProducts.length} productos encontrados</CardDescription>
+          <CardDescription>{filteredProducts?.length} productos encontrados</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -149,10 +151,10 @@ export function Products() {
                     </td>
                     <td className="py-3 px-4">
                       <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${product.estado? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
+                        className={`px-2 py-1 rounded text-xs font-medium ${product.estado ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
                           }`}
                       >
-                        {product.estado  ? "Activo" : "Inactivo"}
+                        {product.estado ? "Activo" : "Inactivo"}
                       </span>
                     </td>
                     <td className="py-3 px-4">

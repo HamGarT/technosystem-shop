@@ -171,10 +171,10 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
                 </SelectTrigger>
                 <SelectContent>
 
-                  <SelectItem value="0">
+                  <SelectItem value="1">
                     Activo
                   </SelectItem>
-                  <SelectItem value="1">
+                  <SelectItem value="0">
                     Inactivo
                   </SelectItem>
 

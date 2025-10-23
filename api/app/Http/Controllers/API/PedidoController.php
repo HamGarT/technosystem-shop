@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderRequest;
+use App\Http\Requests\UpdateOrderStatusRequest;
 use App\Http\Resources\PedidoDetailedResource;
 use App\Http\Resources\PedidoSimpleResource;
 use App\Models\Pedido;
@@ -70,4 +71,23 @@ class PedidoController extends Controller
             ], 404); 
         }
     }
+
+    public function updateStatus($id, UpdateOrderStatusRequest $request){
+    try{
+        $pedido = Pedido::findOrFail($id);
+        $data = $request->validated();
+        
+        $pedido->estado = $data["estado"];
+        $pedido->save();
+        
+        return (new PedidoSimpleResource($pedido))
+            ->response()
+            ->setStatusCode(200);
+            
+    }catch(ModelNotFoundException){
+        return response()->json([
+            'message' => 'Order not found'
+        ], 404);
+    }
+}
 }

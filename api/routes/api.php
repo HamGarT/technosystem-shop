@@ -19,8 +19,8 @@ Route::prefix('pedidos')->group(function () {
     Route::post('/', [PedidoController::class, 'store']);
     Route::get('/', [PedidoController::class, 'index']);
     Route::get('/{id}', [PedidoController::class, 'show']);
+    Route::put('/{id}/status', [PedidoController::class, 'updateStatus']);
 });
-
 
 Route::prefix('categorias')->group(function () {
     Route::post('/', [CategoriaController::class, 'store']);
