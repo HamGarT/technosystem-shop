@@ -30,7 +30,27 @@ export default function CartProvider({ children }) {
   };
 
   const addItem = (product, quantity = 1) => {
-    if (!product || !product.id) return;
+    
+    if (!product || !product.id) {
+      return false;
+    }
+    
+    if (quantity <= 0) {
+      return false;
+    }
+    
+    if (product.stock <= 0) {
+      return false;
+    }
+    
+    const existingItem = cart.find(item => item.product.id === product.id);
+    const currentQuantity = existingItem ? existingItem.quantity : 0;
+    const newQuantity = currentQuantity + quantity;
+    
+    if (newQuantity > product.stock) {
+      return false;
+    }
+
     setCart(prev => {
       const idx = prev.findIndex(i => i.product.id === product.id);
       if (idx >= 0) {
@@ -40,6 +60,8 @@ export default function CartProvider({ children }) {
       }
       return [...prev, { product, quantity: Math.max(1, quantity) }];
     });
+    
+    return true;
   };
 
   const removeItem = (productId) => {
@@ -47,10 +69,30 @@ export default function CartProvider({ children }) {
   };
 
   const updateQuantity = (productId, quantity) => {
+    if (quantity <= 0) {
+      removeItem(productId);
+      return;
+    }
+    
+    // Verificar stock si es necesario
+    const item = cart.find(i => i.product.id === productId);
+    if (item && quantity > item.product.stock) {
+      return false;
+    }
+    
     setCart(prev => prev.map(i => i.product.id === productId ? { ...i, quantity: Math.max(1, quantity) } : i));
+    return true;
   };
 
   const clearCart = () => setCart([]);
+
+  const getTotalItems = () => {
+    return cart.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce((total, item) => total + (item.product.precio * item.quantity), 0);
+  };
 
   const value = {
     cart,
@@ -58,7 +100,10 @@ export default function CartProvider({ children }) {
     removeItem,
     updateQuantity,
     clearCart,
-    totals: getTotals()
+    totals: getTotals(),
+    items: cart,
+    getTotalItems,
+    getTotalPrice
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

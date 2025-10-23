@@ -24,8 +24,8 @@ export default function Cart() {
       cantidad: item.quantity
     }));
     setOrder(prev => ({
-      ...prev,           
-      pedido_items    
+      ...prev,
+      pedido_items
     }));
 
     console.log(pedido_items);
@@ -44,12 +44,18 @@ export default function Cart() {
     return s;
   }, { items: 0, subtotal: 0 });
 
-  const handleCheckout = () => {
-    axios.post(`${apiUrl}/api/pedidos`, order);
-    alert('Checkout: total S/. ' + currencyFormat(totals.subtotal));
-    
-    // ejemplo de redirección:
-    // navigate('/checkout');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    try {
+      await axios.post(`${apiUrl}/api/pedidos`, order);
+      alert('SU PEDIDO A SIDO REGISTRADO CORRECTAMENTE');
+    } catch (error) {
+      alert('Error al registrar el pedido');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!cart || cart.length === 0) {

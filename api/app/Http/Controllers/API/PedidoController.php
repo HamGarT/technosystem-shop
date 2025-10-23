@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderRequest;
-use App\Http\Resources\PedidoResource;
+use App\Http\Resources\PedidoDetailedResource;
+use App\Http\Resources\PedidoSimpleResource;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
 use App\Models\Producto;
@@ -17,7 +18,7 @@ class PedidoController extends Controller
     //
     public function index(){
         $pedidos = Pedido::with('usuario')->paginate(15);
-        return PedidoResource::collection($pedidos);
+        return PedidoSimpleResource::collection($pedidos);
     }
     public function store(CreateOrderRequest $request){
         $total_price = 0;
@@ -50,15 +51,16 @@ class PedidoController extends Controller
         $pedido->precio_total = $total_price;
         $pedido->cantidad_productos = $cantidad_productos;
         $pedido->save();
-        return (new PedidoResource($pedido))
+        return (new PedidoSimpleResource($pedido))
             ->response()
             ->setStatusCode(201);
     }
 
     public function show($id){
         try{
-            $pedido = Pedido::findOrFail($id);
-            return (new PedidoResource($pedido))
+            //$pedido = Pedido::findOrFail($id);
+            $pedido = Pedido::with('usuario', 'pedidos.producto')->find($id); 
+            return (new PedidoDetailedResource($pedido))
                     ->response()
                     ->setStatusCode(201);
 
