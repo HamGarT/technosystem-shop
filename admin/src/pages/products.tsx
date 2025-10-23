@@ -53,6 +53,8 @@ export function Products() {
         .catch(e => {
           console.log("error al guarda producto", e)
         });
+      alert("Producto registrado correctamente");
+      console.log(product)
       setProducts([...products, { ...product, id: Math.max(...products.map((p) => p.id), 0) + 1 }])
     }
     setShowForm(false)

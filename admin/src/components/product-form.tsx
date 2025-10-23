@@ -25,7 +25,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ onSave, onCancel, editingId, initialData }: ProductFormProps) {
-  const apiUrl =  import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [categories, setCategories] = useState<SimpleCategory[]>([]);
   const [formData, setFormData] = useState(
     initialData || {
@@ -49,6 +49,15 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
       })
   }, [])
 
+  useEffect(() => {
+    if (initialData && !formData.category_id) {
+      const categoryId = categories.find((item) => item.nombre === initialData.categoria)?.id.toString();
+      if (categoryId) {
+        setFormData({ ...formData, category_id: categoryId });
+      }
+    }
+  }, [initialData, categories]);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
     if (!formData.nombre.trim()) newErrors.nombre = "El nombre es requerido"
@@ -68,7 +77,10 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
         ...formData,
         precio: Number.parseFloat(formData.precio),
         stock: Number.parseInt(formData.stock),
+        categoria: categories.find((item) => item.id == formData.category_id)?.nombre
       })
+      console.log('category_id:', formData.category_id);  // Verifica qué valor tiene
+      console.log('categories:',  categories.find((item) => item.id == formData.category_id)?.nombre);
     }
   }
 
@@ -105,9 +117,12 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
             </div>
             <div>
               <label>Categorías</label>
-              <Select 
-                onValueChange={(value) => setFormData({...formData, category_id: value})}
-                value={categories.find((item) => item.nombre === initialData.categoria)?.id.toString() || ""}
+              <Select
+                value={formData.category_id || ""}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, category_id: value });
+                }}
+
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona una categoría" />
@@ -147,9 +162,9 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
             </div>
             <div>
               <label className="text-sm font-medium">Estado</label>
-              <Select 
-                onValueChange={(value) => setFormData({...formData, estado: value})}
-                value={formData.estado? "0" : "1"}
+              <Select
+                onValueChange={(value) => setFormData({ ...formData, estado: value })}
+                value={formData.estado ? "0" : "1"}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona un estado" />
