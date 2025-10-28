@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Search, Eye, CheckCircle, Clock, AlertCircle, X } from "lucide-react"
 import axios from "axios"
 import { toast } from "react-hot-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 
 interface OrderItem {
   producto: string
@@ -47,12 +49,7 @@ export function Orders() {
       });
 
       if (response.status === 200) {
-        setOrders(orders.map((o) => (o.id === orderId ? { ...o, estado: newStatus } : o)))
-        setSelectedOrder({
-          ...selectedOrder,
-          estado: newStatus,
-          id: String(selectedOrder!.id)
-        } as Order);
+        setOrders(orders.map((order) => (order.id === orderId ? { ...order, estado: newStatus } : order)))
         toast.success('Estado actualizado correctamente');
       }
     } catch (error) {
@@ -114,13 +111,7 @@ export function Orders() {
     }
   }
 
-  // const upfecha_pedidoOrderStatus = (orderId: string, newStatus: Order["estado"]) => {
-  //   setOrders(orders.map((o) => (o.id === orderId ? { ...o, estado: newStatus } : o)))
-  //   if (selectedOrder?.id === orderId) {
-  //     setSelectedOrder({ ...selectedOrder, estado: newStatus })
-  //   }
-  // }
-
+ 
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -205,8 +196,6 @@ export function Orders() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Order Details Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -217,7 +206,7 @@ export function Orders() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Customer Info */}
+
               <div>
                 <h3 className="font-semibold mb-2">Información del Cliente</h3>
                 <div className="space-y-1 text-sm">
@@ -233,7 +222,6 @@ export function Orders() {
                 </div>
               </div>
 
-              {/* Order Items */}
               <div>
                 <h3 className="font-semibold mb-2">Artículos</h3>
                 <div className="space-y-2">
@@ -249,26 +237,29 @@ export function Orders() {
                 </div>
               </div>
 
-              {/* Order Summary */}
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-semibold">Total:</span>
                   <span className="text-2xl font-bold">${selectedOrder.precio_total.toFixed(2)}</span>
                 </div>
 
-                {/* Status Upfecha_pedido */}
+
                 <div>
                   <label className="text-sm font-medium block mb-2">Cambiar Estado</label>
-                  <select
+                  <Select
                     value={selectedOrder.estado}
-                    onChange={(e) => updateOrderStatus(selectedOrder.id, e.target.value as Order["estado"])}
-                    className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
+                    onValueChange={(value) => updateOrderStatus(selectedOrder.id, value as Order["estado"])}
                   >
-                    <option value="pendiente">Pendiente</option>
-                    <option value="procesando">Procesando</option>
-                    <option value="completado">Completado</option>
-                    <option value="cancelado">Cancelado</option>
-                  </select>
+                    <SelectTrigger className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground">
+                      <SelectValue placeholder="Selecciona una categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendiente">Pendiente</SelectItem>
+                      <SelectItem value="procesando">Procesando</SelectItem>
+                      <SelectItem value="completado">Completado</SelectItem>
+                      <SelectItem value="cancelado">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

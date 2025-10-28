@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Plus, Edit2, Trash2, Package } from "lucide-react"
 import axios from "axios";
 import { toast } from "react-hot-toast"
+import { Textarea } from "@/components/ui/textarea"
 
 interface Category {
   id: number
@@ -112,8 +113,6 @@ export function Categories() {
           <p className="text-muted-foreground">Gestiona las categorías de productos</p>
         </div>
       </div>
-
-      {/* Add/Edit Category Form */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>{editingId ? "Editar Categoría" : "Nueva Categoría"}</CardTitle>
@@ -143,7 +142,7 @@ export function Categories() {
             </div>
             <div>
               <label className="text-sm font-medium">Descripción</label>
-              <textarea
+              <Textarea
                 value={editingId ? editDescription : newDescription}
                 onChange={(e) => (editingId ? setEditDescription(e.target.value) : setNewDescription(e.target.value))}
                 placeholder="Descripción de la categoría"
@@ -176,7 +175,6 @@ export function Categories() {
         </CardContent>
       </Card>
 
-      {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((category) => (
           <Card key={category.id} className="hover:shadow-lg transition-shadow">

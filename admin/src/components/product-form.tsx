@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Textarea } from "./ui/textarea"
+import { Label } from "./ui/label"
 import type { SimpleCategory } from "@/types"
 import axios from "axios"
 
@@ -79,10 +81,10 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
         stock: Number.parseInt(formData.stock),
         categoria: categories.find((item) => item.id == formData.category_id)?.nombre
       })
-      console.log('category_id:', formData.category_id);  // Verifica qué valor tiene
-      console.log('categories:',  categories.find((item) => item.id == formData.category_id)?.nombre);
     }
   }
+
+  
 
   return (
     <Card className="mb-8">
@@ -192,8 +194,8 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
             />
           </div>
           <div>
-            <label className="text-sm font-medium">Descripción</label>
-            <textarea
+            <Label className="text-sm font-medium">Descripción</Label>
+            <Textarea
               value={formData.descripcion}
               onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
               placeholder="Descripción del producto"

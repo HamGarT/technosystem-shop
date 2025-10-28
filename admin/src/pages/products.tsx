@@ -8,6 +8,8 @@ import { ProductForm } from "@/components/product-form"
 import axios from "axios"
 import { toast } from "react-hot-toast"
 
+import { toast as toastsonner } from "sonner"
+
 interface Product {
   id: number
   nombre: string
@@ -42,13 +44,44 @@ export function Products() {
       p.marca?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  const handleDelete = (id: number) => {
-    setProducts(products.filter((p) => p.id !== id))
+  const handleDelete = async (idProducto: number) => {
+    // if (!window.confirm('¿Seguro que quieres eliminar este producto?')) {
+    //   return;
+    // }
+
+    toastsonner("Eliminar Producto", {
+      description: (
+        <span className="text-gray-600">
+          Este Producto va ser eliminado permanentemente
+        </span>
+      ),
+      action: {
+        label: "Aceptar",
+        onClick: () => console.log("Undo"),
+      }
+    })
+
+    // try {
+    //   await axios.delete(`${apiUrl}/api/products/${idProducto}`);
+    //   toast.success("El producto se eliminó correctamente");
+    //   setProducts(products.filter((p) => p.id !== idProducto))
+    // } catch (error) {
+    //   console.error(error);
+    //   toast.error("Error al eliminar el producto");
+    // }
   }
 
   const handleSave = async (product: Omit<Product, "id">) => {
     if (editingId) {
-      setProducts(products.map((p) => (p.id === editingId ? { ...product, id: editingId } : p)))
+
+      try {
+        await axios.put(`${apiUrl}/api/products/${editingId}`, product);
+        toast.success("Producto actualizado correctamente");
+        setProducts(products.map((p) => (p.id === editingId ? { ...product, id: editingId } : p)))
+      } catch (e) {
+        toast.error("Error al actualizar el producto");
+      }
+
       setEditingId(null)
     } else {
       try {
@@ -61,6 +94,9 @@ export function Products() {
     }
     setShowForm(false)
   }
+
+
+
 
   const editingProduct = editingId ? products.find((p) => p.id === editingId) : null
 
