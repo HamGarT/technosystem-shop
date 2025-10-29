@@ -20,7 +20,7 @@ class CategoriaController extends Controller
 
     public function detailedIndex(){
         $categorias = Categoria::withCount('products')->paginate(15);
-    return CategoriaDetailedResource::collection($categorias);
+        return CategoriaDetailedResource::collection($categorias);
     }
     public function store(StoreCategoriaRequest $request){
         try{
@@ -40,20 +40,23 @@ class CategoriaController extends Controller
 
     public function delete($id){
         try{
-            $categoria = Categoria::findOrFail($id);
+            $categoria = Categoria::withCount('products')->findOrFail($id);
+            if($categoria->products_count > 0){ 
+                throw new Exception("Categoria con productos no puede ser eliminada");
+            }
             $categoria->delete();
             return response()->json([
-                "message" => "Category succesfully deleted",
+                "message" => "Categoria eliminada exitosamente",
             ]);
         }catch(ModelNotFoundException){
             return response()->json([
-                "message"=>"Category not found"
+                "message"=>"Categoria no encontrada"
             ], 404);
         }catch(Exception $e){
             return response()->json([
-                "message"=> "Failed to delete category",
-                "error" => "Internal server error"
-            ], 500);
+                "message"=> "Error al eliminar categoria",
+                "error" => $e->getMessage()
+            ], 422);
         }
-    }
+    }   
 }

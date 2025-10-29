@@ -26,5 +26,6 @@ Route::prefix('categorias')->group(function () {
     Route::post('/', [CategoriaController::class, 'store']);
     Route::get('/', [CategoriaController::class, 'index']);
     Route::get('/detailed', [CategoriaController::class, 'detailedIndex']);
+    Route::delete('/{id}', [CategoriaController::class, 'delete']);
 });
 

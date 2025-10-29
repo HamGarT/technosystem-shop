@@ -8,7 +8,7 @@ import { Plus, Edit2, Trash2, Package } from "lucide-react"
 import axios from "axios";
 import { toast } from "react-hot-toast"
 import { Textarea } from "@/components/ui/textarea"
-
+import { toast as toastsonner } from "sonner"
 interface Category {
   id: number
   nombre: string
@@ -26,6 +26,7 @@ export function Categories() {
   const [editName, setEditName] = useState("")
   const [editDescription, setEditDescription] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+
 
   const generateSlug = (name: string) => {
     return name
@@ -101,9 +102,28 @@ export function Categories() {
     }
   }
 
-  const handleDelete = (id: number) => {
-    setCategories(categories.filter((c) => c.id !== id))
-  }
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`${apiUrl}/api/categorias/${id}`);
+      toastsonner.success("Categoria eliminada correctamente");
+      setCategories(categories.filter((c) => c.id !== id));
+    } catch (e) {
+      console.error(e);
+      toastsonner("🚨 Error al eliminar Categoria", {
+        description: (
+          <span className="text-gray-600">
+            {e instanceof Error ? e.response.data.error : String(e)}
+          </span>
+        ),
+        action: {
+          label: "Aceptar",
+          onClick: () => null,
+        },
+        duration: Infinity
+
+      });
+    }
+  };
 
   return (
     <div className="p-8">

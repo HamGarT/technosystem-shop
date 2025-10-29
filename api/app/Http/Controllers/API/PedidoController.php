@@ -11,8 +11,8 @@ use App\Models\PedidoItem;
 use App\Models\Producto;
 use Date;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
-use function PHPUnit\Framework\returnArgument;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class PedidoController extends Controller
 {
@@ -22,23 +22,30 @@ class PedidoController extends Controller
         return PedidoSimpleResource::collection($pedidos);
     }
     public function store(CreateOrderRequest $request){
-        $total_price = 0;
-        $cantidad_productos = 0;
-        $data = $request->validated();
-    
-        $pedido = Pedido::create([
-            "estado" => "pendiente",
-            "fecha_pedido" => now(), 
-            "departamento" => $data["departamento"],
-            "provincia" => $data["provincia"],
-            "direccion_entrega" => $data["direccion"],
-            "usuario_id" => $data["usuario_id"],
-        ]);
+       try {
+            DB::beginTransaction();
         
-        foreach($data["pedido_items"] as $item) {
-            $producto = Producto::find($item["producto_id"]);
+            $total_price = 0;
+            $cantidad_productos = 0;
+            $data = $request->validated();
+
+            $pedido = Pedido::create([
+                "estado" => "pendiente",
+                "fecha_pedido" => now(), 
+                "departamento" => $data["departamento"],
+                "provincia" => $data["provincia"],
+                "direccion_entrega" => $data["direccion"],
+                "usuario_id" => $data["usuario_id"],
+            ]);
         
-            if($producto) {
+            foreach($data["pedido_items"] as $item) {
+                $producto = Producto::lockForUpdate()->find($item["producto_id"]);
+                if(!$producto) {
+                    throw new Exception("Producto no encontrado: {$item['producto_id']}");
+                }
+                if($producto->stock < $item['cantidad']) {
+                    throw new Exception("Stock insuficiente para {$producto->nombre}. Disponible: {$producto->stock}, Solicitado: {$item['cantidad']}");
+                }
                 PedidoItem::create([
                     'pedido_id' => $pedido->id,
                     'producto_id' => $producto->id,
@@ -46,15 +53,23 @@ class PedidoController extends Controller
                 ]);
                 $total_price += $producto->precio * $item["cantidad"];
                 $cantidad_productos += $item["cantidad"];
+                $producto->decrement('stock', $item['cantidad']);
             }
+            $pedido->precio_total = $total_price;
+            $pedido->cantidad_productos = $cantidad_productos;
+            $pedido->save();
+            DB::commit();
+            return (new PedidoSimpleResource($pedido))
+                ->response()
+                ->setStatusCode(201);
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error al crear el pedido',
+                'error' => $e->getMessage()
+            ], 422);
         }
-    
-        $pedido->precio_total = $total_price;
-        $pedido->cantidad_productos = $cantidad_productos;
-        $pedido->save();
-        return (new PedidoSimpleResource($pedido))
-            ->response()
-            ->setStatusCode(201);
     }
 
     public function show($id){

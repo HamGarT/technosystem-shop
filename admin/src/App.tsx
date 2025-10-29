@@ -7,7 +7,7 @@ import { Toaster as ToasterS } from "@/components/ui/sonner"
 export default function App() {
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <ToasterS position="top-center"/>
       <Routes>
         <Route path="/*" element={<RootLayout />} />

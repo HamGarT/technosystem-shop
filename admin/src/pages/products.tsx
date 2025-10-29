@@ -27,6 +27,7 @@ export function Products() {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     axios.get(`${apiUrl}/api/products`)
@@ -44,42 +45,44 @@ export function Products() {
       p.marca?.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  const handleDelete = async (idProducto: number) => {
-    // if (!window.confirm('¿Seguro que quieres eliminar este producto?')) {
-    //   return;
-    // }
-
-    toastsonner("Eliminar Producto", {
+  const handleDelete = (idProducto: number) => {
+    toastsonner("⚠️ Eliminar Producto", {
       description: (
         <span className="text-gray-600">
-          Este Producto va ser eliminado permanentemente
+          Este producto será eliminado permanentemente. ¿Deseas continuar?
         </span>
       ),
       action: {
-        label: "Aceptar",
-        onClick: () => console.log("Undo"),
-      }
-    })
+        label: isDeleting ? "Eliminando..." : "Eliminar",
+        onClick: async () => {
+          if (isDeleting) return;
 
-    // try {
-    //   await axios.delete(`${apiUrl}/api/products/${idProducto}`);
-    //   toast.success("El producto se eliminó correctamente");
-    //   setProducts(products.filter((p) => p.id !== idProducto))
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Error al eliminar el producto");
-    // }
+          setIsDeleting(true);
+          try {
+            await axios.delete(`${apiUrl}/api/products/${idProducto}`);
+            toastsonner.success("Producto eliminado correctamente");
+            setProducts(products.filter((p) => p.id !== idProducto));
+          } catch (error) {
+            console.error("Error al eliminar producto:", error);
+            toastsonner.error( "Error al eliminar el producto");
+          } finally {
+            setIsDeleting(false);
+          }
+        },
+      },
+      duration: 8000,
+    });
   }
 
   const handleSave = async (product: Omit<Product, "id">) => {
     if (editingId) {
-
+      console.log(product)
       try {
         await axios.put(`${apiUrl}/api/products/${editingId}`, product);
-        toast.success("Producto actualizado correctamente");
+        toastsonner.success("Producto actualizado correctamente");
         setProducts(products.map((p) => (p.id === editingId ? { ...product, id: editingId } : p)))
       } catch (e) {
-        toast.error("Error al actualizar el producto");
+        toastsonner.error("Error al actualizar el producto");
       }
 
       setEditingId(null)
@@ -87,9 +90,9 @@ export function Products() {
       try {
         const response = await axios.post(`${apiUrl}/api/products`, product);
         setProducts([...products, response.data.data]);
-        toast.success("Producto registrado correctamente");
+        toastsonner.success("Producto registrado correctamente");
       } catch (error) {
-        toast.error("Error al guardar producto");
+        toastsonner.error("Error al guardar producto");
       }
     }
     setShowForm(false)

@@ -38,7 +38,7 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
       descripcion: "",
       marca: "",
       image_url: "",
-      status: "0" as const,
+      estado: true,
     },
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -84,7 +84,7 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
     }
   }
 
-  
+
 
   return (
     <Card className="mb-8">
@@ -165,21 +165,19 @@ export function ProductForm({ onSave, onCancel, editingId, initialData }: Produc
             <div>
               <label className="text-sm font-medium">Estado</label>
               <Select
-                onValueChange={(value) => setFormData({ ...formData, estado: value })}
-                value={formData.estado ? "0" : "1"}
+                onValueChange={(value) => setFormData({ ...formData, estado: value === "true" })}
+                value={String(formData.estado)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona un estado" />
                 </SelectTrigger>
                 <SelectContent>
-
-                  <SelectItem value="1">
+                  <SelectItem value="true">
                     Activo
                   </SelectItem>
-                  <SelectItem value="0">
+                  <SelectItem value="false">
                     Inactivo
                   </SelectItem>
-
                 </SelectContent>
               </Select>
             </div>
