@@ -13,3 +13,42 @@ docker run --name technosystem-shop \
   -e POSTGRES_DB=technosystemdb \
   -p 5432:5432 \
   -d postgres:15
+
+
+set up jwt configuration
+
+# 1. Instalar paquete
+composer require tymon/jwt-auth
+
+# 2. Publicar configuración (crea config/jwt.php)
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+
+# 3. Generar clave secreta (actualiza .env)
+php artisan jwt:secret
+
+ALGORITMO RSA
+# Generar par de claves RSA
+openssl genrsa -out storage/jwt/private.key 2048
+
+# Generar clave pública desde la privada
+openssl rsa -in storage/jwt/private.key -pubout -out storage/jwt/public.key
+
+# Dar permisos adecuados
+chmod 600 storage/jwt/private.key
+chmod 644 storage/jwt/public.key
+
+# Algoritmo RS256 (asimétrico)
+JWT_ALGORITHM=RS256
+JWT_SECRET=null
+
+# Rutas a las claves
+JWT_PRIVATE_KEY="${APP_URL}/storage/jwt/private.key"
+JWT_PUBLIC_KEY="${APP_URL}/storage/jwt/public.key"
+
+# O rutas locales
+JWT_PRIVATE_KEY=storage/jwt/private.key
+JWT_PUBLIC_KEY=storage/jwt/public.key
+
+# Tiempos
+JWT_TTL=60
+JWT_REFRESH_TTL=20160
