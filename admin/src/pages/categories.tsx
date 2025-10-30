@@ -112,7 +112,7 @@ export function Categories() {
       toastsonner("🚨 Error al eliminar Categoria", {
         description: (
           <span className="text-gray-600">
-            {e instanceof Error ? e.response.data.error : String(e)}
+               {axios.isAxiosError(e) ? e.response?.data?.error : String(e)}
           </span>
         ),
         action: {
