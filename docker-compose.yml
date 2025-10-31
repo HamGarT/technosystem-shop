@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-  # 🐘 Laravel API
   api:
     build: ./api
     container_name: api
@@ -10,20 +9,26 @@ services:
     volumes:
       - ./api:/var/www/html
     environment:
-      APP_ENV: local
-      APP_DEBUG: true
-      APP_KEY: base64:Etofvb/fNOoruzgWDJSLRSgbGV95CflqjeLEhy1EWG8=
-      APP_URL: http://localhost:8000
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL:-http://localhost:8000}
       DB_CONNECTION: pgsql
-      DB_HOST: postgres        # important: service name
+      DB_HOST: postgres
       DB_PORT: 5432
-      DB_DATABASE: technosystemdb
-      DB_USERNAME: techuser
-      DB_PASSWORD: techuser123
+      DB_DATABASE: ${DB_DATABASE:-technosystemdb}
+      DB_USERNAME: ${DB_USERNAME:-techuser}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
-      - postgres
-
-  # ⚛️ React Web App
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   web:
     build: ./web
     container_name: web
@@ -33,15 +38,17 @@ services:
     tty: true
     volumes:
       - ./web:/app
+      - /app/node_modules
     environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://api:8000
-      - VITE_API_KEY=your_api_key
-      - VITE_ENV=development
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=${VITE_API_URL:-http://api:8000}
+      - VITE_API_KEY=${VITE_API_KEY}
+      - VITE_ENV=${VITE_ENV:-development}
     depends_on:
       - api
+    networks:
+      - app-network
 
-  # ⚛️ React Admin App
   admin:
     build: ./admin
     container_name: admin
@@ -51,41 +58,56 @@ services:
     tty: true
     volumes:
       - ./admin:/app
+      - /app/node_modules
     environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://api:8000
-      - VITE_API_KEY=your_api_key
-      - VITE_ENV=development
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=${VITE_API_URL:-http://api:8000}
+      - VITE_API_KEY=${VITE_API_KEY}
+      - VITE_ENV=${VITE_ENV:-development}
     depends_on:
       - api
+    networks:
+      - app-network
 
-  # 🐘 PostgreSQL Database
   postgres:
-    image: postgres:15
+    image: postgres:latest
     container_name: postgres
     restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: techuser
-      POSTGRES_PASSWORD: techuser123
-      POSTGRES_DB: technosystemdb
+      POSTGRES_USER: ${DB_USERNAME:-techuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE:-technosystemdb}
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-techuser}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # 🧭 Optional: pgAdmin (nice UI for managing PostgreSQL)
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     container_name: pgadmin
     restart: unless-stopped
     ports:
       - "5050:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      SCRIPT_NAME: /pgadmin
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
 
 volumes:
   pg_data:
 
+networks:
+  app-network:
+    driver: bridge
