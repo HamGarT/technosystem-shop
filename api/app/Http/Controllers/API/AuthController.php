@@ -7,10 +7,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException;
 class AuthController extends Controller
 {
 
@@ -182,13 +182,13 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        $ttl = config('jwt.ttl', 60); 
+        $ttl = (int) config('jwt.ttl', 60);  // ✅ Cast to int
         $user = auth('api')->user();
         return response()->json([
             'success' => true,
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_in' => $ttl * 60, 
+            'expires_in' => $ttl * 60,
             'user' => $user
         ], 200);
     }

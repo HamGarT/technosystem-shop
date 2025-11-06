@@ -9,6 +9,8 @@ import ProductView from './components/ProductView';
 import './App.css'
 import './index.css'
 import Cart from './pages/Cart';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
 
 
 function App() {
@@ -21,7 +23,8 @@ function App() {
         <Route path="/shop" element={<Shop />}/> 
         <Route path="/product/:id" element={<ProductView />}/>
         <Route path='/cart' element={<Cart />} />
-
+        <Route path='/login' element={<LoginPage/>} />
+        <Route path='/register' element={<RegisterPage/>}/>
       </Routes>
       <Footer /> 
     </div>

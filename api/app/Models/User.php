@@ -6,7 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -68,5 +68,15 @@ class User extends Authenticatable implements JWTSubject
             'role' => $this->role,
             'name' => $this->name,
         ];
+    }
+
+     public function hasVerifiedEmail()
+    {
+        return $this->email_verified_at !== null;
+    }
+
+    public function hasVerifiedPhone()
+    {
+        return $this->phone_verified_at !== null;
     }
 }
