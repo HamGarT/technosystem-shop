@@ -75,8 +75,4 @@ class User extends Authenticatable implements JWTSubject
         return $this->email_verified_at !== null;
     }
 
-    public function hasVerifiedPhone()
-    {
-        return $this->phone_verified_at !== null;
-    }
 }

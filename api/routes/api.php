@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\CategoriaController;
+use App\Http\Controllers\API\EmailVerificationController;
 use App\Http\Controllers\API\PedidoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ProductoController;
@@ -8,8 +9,11 @@ use App\Http\Controllers\API\AuthController;
 
 
 Route::group(['prefix' => 'auth'], function () {
+    Route::post('/verify-email', [EmailVerificationController::class, 'verifyEmail']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/verify-otp', [EmailVerificationController::class, 'verifyOTP']);
+    Route::post('/resend-otp', [EmailVerificationController::class, 'resendOTP']);
     
     // User routes - accessible to all authenticated users
     Route::middleware('auth:api')->group(function () {
@@ -18,6 +22,7 @@ Route::group(['prefix' => 'auth'], function () {
         Route::get('/me', [AuthController::class, 'me']);
     });
 });
+
 
 
 // Route::prefix('products')->group(function () {
@@ -45,19 +50,19 @@ Route::prefix('products')->group(function () {
     Route::get('/{id}', [ProductoController::class, 'show']);
     
     // Admin only - Create, Update, Delete
-    Route::middleware(['auth:api', 'role:admin'])->group(function () {
+    //Route::middleware(['auth:api', 'role:admin'])->group(function () {
         Route::post('/', [ProductoController::class, 'store']);
         Route::put('/{id}', [ProductoController::class, 'update']);
         Route::delete('/{id}', [ProductoController::class, 'delete']);
-    });
+    // });
 });
 
 Route::prefix('pedidos')->middleware('auth:api')->group(function () {
     // Admin only
-    Route::middleware('role:admin')->group(function () {
+    //Route::middleware('role:admin')->group(function () {
         Route::post('/', [PedidoController::class, 'store']);
         Route::put('/{id}/status', [PedidoController::class, 'updateStatus']);
-    });
+    // });
     
     // All authenticated users
     Route::get('/', [PedidoController::class, 'index']);

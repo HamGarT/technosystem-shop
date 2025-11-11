@@ -10,12 +10,15 @@ use App\Models\Pedido;
 use App\Models\PedidoItem;
 use App\Models\Producto;
 use Date;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
 class PedidoController extends Controller
 {
+
+    use HasFactory;
     //
     public function index(){
         $pedidos = Pedido::with('usuario')->paginate(15);

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom' 
+import { Routes, Route } from 'react-router-dom'
 
 import Home from "@/pages/home";
 import Shop from "@/pages/Shop";
@@ -9,8 +9,7 @@ import ProductView from './components/ProductView';
 import './App.css'
 import './index.css'
 import Cart from './pages/Cart';
-import LoginPage from './components/LoginPage';
-import RegisterPage from './components/RegisterPage';
+
 
 
 function App() {
@@ -18,17 +17,15 @@ function App() {
     <div className="App">
       <Header />
       <Routes>
-        <Route path="/" element={<Home />}/>   
-        <Route path="/about" element={<About />}/>   
-        <Route path="/shop" element={<Shop />}/> 
-        <Route path="/product/:id" element={<ProductView />}/>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/product/:id" element={<ProductView />} />
         <Route path='/cart' element={<Cart />} />
-        <Route path='/login' element={<LoginPage/>} />
-        <Route path='/register' element={<RegisterPage/>}/>
       </Routes>
-      <Footer /> 
+      <Footer />
     </div>
-    
+
   )
 
 }

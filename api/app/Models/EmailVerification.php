@@ -9,7 +9,7 @@ class EmailVerification extends Model
     protected $fillable = [
         'user_id',
         'code',
-        'type',
+        'email',
         'contact',
         'verified',
         'attempts',
