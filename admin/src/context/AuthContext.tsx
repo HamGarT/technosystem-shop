@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import axios from 'axios';
-import api from '../config/api';
-
+import api from '@/config/api';
 interface User {
     id: number;
     name: string;
@@ -16,7 +15,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     error: string | null;
     emailExists: boolean | null; // Nuevo
-    
+
     // Métodos
     loginWithEmail: (email: string) => Promise<boolean>; // Devuelve si existe
     verifyOtp: (email: string, otp: string) => Promise<void>;
@@ -32,7 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [emailExists, setEmailExists] = useState<boolean | null>(null);
 
@@ -43,6 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setToken(savedToken);
             getCurrentUser();
         }
+        setLoading(false);
     }, []);
 
     const loginWithEmail = async (email: string): Promise<boolean> => {
@@ -60,8 +60,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setEmailExists(true);
                 return true;
             }
-            
-            const errorMsg = axios.isAxiosError(err) 
+
+            const errorMsg = axios.isAxiosError(err)
                 ? err.response?.data?.message || "Error al verificar email"
                 : "Error de conexión";
             setError(errorMsg);
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             await api.post("/auth/verify-otp", { email, code: otp });
             return;
         } catch (err) {
-            const errorMsg = axios.isAxiosError(err) 
+            const errorMsg = axios.isAxiosError(err)
                 ? err.response?.data?.message || "Código OTP inválido"
                 : "Error de conexión";
             setError(errorMsg);
@@ -98,8 +98,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         lastName: string,
         email: string,
         password: string,
-        passwordConfirmation: string,
-        otp: string
+        passwordConfirmation: string
     ) => {
         setLoading(true);
         setError(null);
@@ -142,7 +141,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             return;
         } catch (err) {
-            const errorMsg = axios.isAxiosError(err) 
+            const errorMsg = axios.isAxiosError(err)
                 ? err.response?.data?.message || "Error al registrar usuario"
                 : "Error de conexión";
             setError(errorMsg);
@@ -161,22 +160,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 email,
                 password,
             });
-            console.log(data)
-
-            // Guardar token y usuario
             if (data.access_token) {
                 localStorage.setItem("authToken", data.access_token);
                 setToken(data.access_token);
             }
-
             if (data.user) {
-                
                 setUser(data.user);
+            } else {
+                await getCurrentUser(); 
             }
 
             return;
         } catch (err) {
-            const errorMsg = axios.isAxiosError(err) 
+            const errorMsg = axios.isAxiosError(err)
                 ? err.response?.data?.message || "Credenciales inválidas"
                 : "Error de conexión";
             setError(errorMsg);

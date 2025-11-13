@@ -21,7 +21,7 @@ export default function RootLayout() {
                 <AppSidebar variant="inset"/>
                 <SidebarInset>
                     <Routes>
-                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/categories" element={<Categories />} />
                         <Route path="/orders" element={<Orders />} />
                         <Route path="/products" element={<Products />} />

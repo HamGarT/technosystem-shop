@@ -50,27 +50,28 @@ Route::prefix('products')->group(function () {
     Route::get('/{id}', [ProductoController::class, 'show']);
     
     // Admin only - Create, Update, Delete
-    //Route::middleware(['auth:api', 'role:admin'])->group(function () {
+    Route::middleware(['auth:api', 'role:admin'])->group(function () {
         Route::post('/', [ProductoController::class, 'store']);
         Route::put('/{id}', [ProductoController::class, 'update']);
         Route::delete('/{id}', [ProductoController::class, 'delete']);
-    // });
+    });
 });
 
 Route::prefix('pedidos')->middleware('auth:api')->group(function () {
     // Admin only
-    //Route::middleware('role:admin')->group(function () {
-        Route::post('/', [PedidoController::class, 'store']);
+    
+    Route::middleware('role:admin')->group(function () {
         Route::put('/{id}/status', [PedidoController::class, 'updateStatus']);
-    // });
+    });
     
     // All authenticated users
+    Route::post('/', [PedidoController::class, 'store']);
     Route::get('/', [PedidoController::class, 'index']);
     Route::get('/{id}', [PedidoController::class, 'show']);
 });
 
 Route::prefix('categorias')->group(function () {
-    Route::post('/', [CategoriaController::class, 'store']);
+    Route::post('/', [CategoriaController::class, 'store']); 
     Route::get('/', [CategoriaController::class, 'index']);
     Route::get('/detailed', [CategoriaController::class, 'detailedIndex']);
     Route::delete('/{id}', [CategoriaController::class, 'delete']);

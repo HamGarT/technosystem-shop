@@ -1,4 +1,3 @@
-// web/src/pages/Cart.jsx
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/useCart';
@@ -12,7 +11,7 @@ const currencyFormat = (v) => Number(v).toFixed(2);
 export default function Cart() {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const { cart, updateQuantity, removeItem, clearCart } = useCart();
   const [order, setOrder] = useState({
     departamento: "Lima",
@@ -52,22 +51,29 @@ export default function Cart() {
 
   const handleCheckout = async () => {
     setIsLoading(true);
-    console.log(isAuthenticated)
     try {
-      if (isAuthenticated) {
-        newOrder = {
-          ...order,
-          usuario_id: user.id
-        }
-        console.log(newOrder)
-        await axios.post(`${apiUrl}/api/pedidos`, {...order, usuario_id: user.id});
-        alert('SU PEDIDO A SIDO REGISTRADO CORRECTAMENTE');
-      } else {
-        setIsLoginOpen(true)
+      if (!isAuthenticated) {
+        setIsLoginOpen(true);
+        return;
       }
 
+      const newOrder = {
+        ...order,
+        usuario_id: user.id
+      };
+
+      console.log(newOrder);
+      console.log(token)
+      await axios.post(`${apiUrl}/api/pedidos`, newOrder, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      alert('¡Pedido registrado correctamente!');
     } catch (error) {
-      alert('Error al registrar el pedido');
+      const message = error.response?.data?.message || 'Error al registrar el pedido';
+      alert(`Error: ${message}`);
     } finally {
       setIsLoading(false);
     }

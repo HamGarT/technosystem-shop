@@ -8,7 +8,7 @@ import { Search, Eye, CheckCircle, Clock, AlertCircle, X } from "lucide-react"
 import axios from "axios"
 import { toast } from "react-hot-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
+import api from "@/config/api"
 
 interface OrderItem {
   producto: string
@@ -36,7 +36,7 @@ export function Orders() {
   const [estadoFilter, setStatusFilter] = useState<string>("all")
 
   useEffect(() => {
-    axios.get(`${apiUrl}/api/pedidos`).then((response) => {
+    api.get(`/pedidos`).then((response) => {
       console.log(response.data.data)
       setOrders([...orders, ...response.data.data])
     })
@@ -44,7 +44,7 @@ export function Orders() {
 
   const updateOrderStatus = async (orderId: string | number, newStatus: Order["estado"]) => {
     try {
-      const response = await axios.put(`${apiUrl}/api/pedidos/${orderId}/status`, {
+      const response = await api.put(`/pedidos/${orderId}/status`, {
         estado: newStatus
       });
 
@@ -60,7 +60,7 @@ export function Orders() {
   };
 
   const handleGetOrder = (idOrder: any) => {
-    axios.get(`${apiUrl}/api/pedidos/${idOrder}`).then((response) => {
+    api.get(`/pedidos/${idOrder}`).then((response) => {
       setSelectedOrder(response.data.data)
     })
   }
@@ -111,7 +111,7 @@ export function Orders() {
     }
   }
 
- 
+
   return (
     <div className="p-8">
       <div className="mb-8">
