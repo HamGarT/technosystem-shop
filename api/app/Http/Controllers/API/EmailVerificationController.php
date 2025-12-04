@@ -16,6 +16,7 @@ class EmailVerificationController extends Controller
      */
     public function verifyEmail(Request $request)
     {
+        set_time_limit(120);
         $request->validate([
             'email' => 'required|string|email|max:255'
         ]);
