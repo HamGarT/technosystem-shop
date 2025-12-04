@@ -61,7 +61,11 @@ export function Products() {
 
           setIsDeleting(true);
           try {
-            await axios.delete(`${apiUrl}/api/products/${idProducto}`);
+            await axios.delete(`${apiUrl}/api/products/${idProducto}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
             toastsonner.success("Producto eliminado correctamente");
             setProducts(products.filter((p) => p.id !== idProducto));
           } catch (error) {
