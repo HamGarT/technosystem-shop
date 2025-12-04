@@ -15,9 +15,17 @@ class ProductoController extends Controller
 
 
 
+    // public function index()
+    // {
+    //     $productos = Producto::with('categoria')->paginate(15);
+    //     return ProductoResource::collection($productos);
+    // }
+
     public function index()
     {
-        $productos = Producto::with('categoria')->paginate(15);
+        $productos = Producto::with('categoria')
+            ->where('estado', true)
+            ->paginate(15);
         return ProductoResource::collection($productos);
     }
 
@@ -136,7 +144,7 @@ class ProductoController extends Controller
             $query->where('nombre', 'ILIKE', '%' . $request->name . '%');
         }
 
-    
+
         if ($request->has('categoria') && $request->categoria) {
             $query->whereHas('categoria', function ($q) use ($request) {
                 $q->where('nombre', 'ILIKE', '%' . $request->categoria . '%');
