@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.10.1",
         "mercadopago/dx-php": "^3.8",
         "php-open-source-saver/jwt-auth": "^2.8",
+        "resend/resend-laravel": "^1.0",
         "twilio/sdk": "^8.8"
     },
     "require-dev": {

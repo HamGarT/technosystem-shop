@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmailVerification;
 use App\Mail\SendOTP;
-use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use Resend\Laravel\Facades\Resend;
 
 class EmailVerificationController extends Controller
 {
@@ -41,8 +41,14 @@ class EmailVerificationController extends Controller
                 'code' => $otp,
                 'expires_at' => now()->addMinutes(10),
             ]);
-            // Enviar OTP por email
-            Mail::to($email)->send(new SendOTP($otp, 'Usuario'));
+            
+            // Enviar OTP por email usando Resend
+            Resend::emails()->send([
+                'from' => config('mail.from.address', 'Acme <onboarding@resend.dev>'),
+                'to' => [$email],
+                'subject' => 'Código de Verificación OTP',
+                'html' => (new SendOTP($otp, 'Usuario'))->render(),
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -153,7 +159,13 @@ class EmailVerificationController extends Controller
                 'expires_at' => now()->addMinutes(10),
             ]);
 
-            Mail::to($email)->send(new SendOTP($otp, 'Usuario'));
+            // Enviar OTP por email usando Resend
+            Resend::emails()->send([
+                'from' => config('mail.from.address', 'noreply@tudominio. com'),
+                'to' => [$email],
+                'subject' => 'Código de Verificación OTP',
+                'html' => (new SendOTP($otp, 'Usuario'))->render(),
+            ]);
 
             return response()->json([
                 'success' => true,
