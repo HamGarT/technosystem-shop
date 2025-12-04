@@ -29,7 +29,6 @@ interface Order {
 }
 
 export function Orders() {
-  const apiUrl = import.meta.env.VITE_API_URL;
   const [orders, setOrders] = useState<Order[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
