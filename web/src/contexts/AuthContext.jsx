@@ -1,40 +1,15 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import api from '../config/api';
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    created_at: string;
-}
+const AuthContext = createContext(undefined);
 
-interface AuthContextType {
-    user: User | null;
-    token: string | null;
-    loading: boolean;
-    isAuthenticated: boolean;
-    error: string | null;
-    emailExists: boolean | null; // Nuevo
-    
-    // Métodos
-    loginWithEmail: (email: string) => Promise<boolean>; // Devuelve si existe
-    verifyOtp: (email: string, otp: string) => Promise<void>;
-    register: (firstName: string, lastName: string, email: string, password: string, passwordConfirmation: string, otp: string) => Promise<void>;
-    login: (email: string, password: string) => Promise<void>;
-    logout: () => Promise<void>;
-    getCurrentUser: () => Promise<void>;
-    clearError: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [emailExists, setEmailExists] = useState<boolean | null>(null);
+    const [error, setError] = useState(null);
+    const [emailExists, setEmailExists] = useState(null);
 
     // Cargar token del localStorage al montar
     useEffect(() => {
@@ -45,7 +20,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, []);
 
-    const loginWithEmail = async (email: string): Promise<boolean> => {
+    const loginWithEmail = async (email) => {
         setLoading(true);
         setError(null);
         setEmailExists(null);
@@ -56,7 +31,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setEmailExists(exists);
             return exists;
         } catch (err) {
-            if (axios.isAxiosError(err) && err.response?.status === 400) {
+            if (axios.isAxiosError(err) && err.response?. status === 400) {
                 setEmailExists(true);
                 return true;
             }
@@ -71,20 +46,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    const verifyOtp = async (email: string, otp: string) => {
+    const verifyOtp = async (email, otp) => {
         setLoading(true);
         setError(null);
 
         try {
-            if (otp.length !== 6) {
+            if (otp. length !== 6) {
                 throw new Error("El código debe tener 6 dígitos");
             }
 
             await api.post("/auth/verify-otp", { email, code: otp });
             return;
         } catch (err) {
-            const errorMsg = axios.isAxiosError(err) 
-                ? err.response?.data?.message || "Código OTP inválido"
+            const errorMsg = axios. isAxiosError(err) 
+                ? err.response?. data?.message || "Código OTP inválido"
                 : "Error de conexión";
             setError(errorMsg);
             throw err;
@@ -94,21 +69,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const register = async (
-        firstName: string,
-        lastName: string,
-        email: string,
-        password: string,
-        passwordConfirmation: string,
-        otp: string
+        firstName,
+        lastName,
+        email,
+        password,
+        passwordConfirmation,
+        otp
     ) => {
         setLoading(true);
         setError(null);
 
-        if (!firstName.trim()) {
+        if (!firstName. trim()) {
             throw new Error("El nombre es requerido");
         }
 
-        if (!lastName.trim()) {
+        if (!lastName. trim()) {
             throw new Error("El apellido es requerido");
         }
 
@@ -121,7 +96,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         try {
-            const fullName = `${firstName.trim()} ${lastName.trim()}`;
+            const fullName = `${firstName. trim()} ${lastName.trim()}`;
 
             const { data } = await api.post("/auth/register", {
                 name: fullName,
@@ -131,19 +106,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             });
 
             // Guardar token y usuario
-            if (data.token) {
-                localStorage.setItem("authToken", data.token);
+            if (data. token) {
+                localStorage.setItem("authToken", data. token);
                 setToken(data.token);
             }
 
-            if (data.user) {
-                setUser(data.user);
+            if (data. user) {
+                setUser(data. user);
             }
 
             return;
         } catch (err) {
-            const errorMsg = axios.isAxiosError(err) 
-                ? err.response?.data?.message || "Error al registrar usuario"
+            const errorMsg = axios. isAxiosError(err) 
+                ? err.response?. data?.message || "Error al registrar usuario"
                 : "Error de conexión";
             setError(errorMsg);
             throw err;
@@ -152,7 +127,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    const login = async (email: string, password: string) => {
+    const login = async (email, password) => {
         setLoading(true);
         setError(null);
 
@@ -161,7 +136,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 email,
                 password,
             });
-            console.log(data)
+            console. log(data)
 
             // Guardar token y usuario
             if (data.access_token) {
@@ -169,7 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setToken(data.access_token);
             }
 
-            if (data.user) {
+            if (data. user) {
                 
                 setUser(data.user);
             }
@@ -203,7 +178,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setError(null);
 
         try {
-            await api.post("/auth/logout");
+            await api. post("/auth/logout");
         } catch (err) {
             console.error("Error during logout:", err);
         } finally {
@@ -219,11 +194,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setError(null);
     };
 
-    const value: AuthContextType = {
+    const value = {
         user,
         token,
         loading,
-        isAuthenticated: !!token && !!user,
+        isAuthenticated: !! token && !!user,
         error,
         emailExists,
         loginWithEmail,
@@ -235,13 +210,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         clearError,
     };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return <AuthContext. Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Hook para usar el contexto
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
+    if (! context) {
         throw new Error("useAuth debe ser usado dentro de un AuthProvider");
     }
     return context;
