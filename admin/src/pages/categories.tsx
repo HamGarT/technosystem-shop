@@ -39,7 +39,6 @@ export function Categories() {
   useEffect(() => {
     axios.get(`${apiUrl}/api/categorias/detailed`)
       .then((response) => {
-        console.log(response.data)
         setCategories(response.data.data)
       })
   }, []);

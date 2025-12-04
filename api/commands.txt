@@ -1,15 +1,86 @@
+########################################
+#   Comandos Fundamentales de Laravel    #
+########################################
+
+# Crear Modelo, Migración y Controlador de Recursos
 php artisan make:model Product -mc
+
+# Crear Controlador Básico
 php artisan make:controller ControllerName
-php artisan make:resource 
+
+# Crear Recurso (API Resource)
+php artisan make:resource ResourceName
+
+# Ejecutar Migraciones
 php artisan migrate
+
+# Revertir y Volver a Ejecutar Migraciones (¡CUIDADO: Borra datos!)
 php artisan migrate:refresh
+
+# Eliminar todas las Tablas y Volver a Ejecutar Migraciones (¡CUIDADO: Borra datos!)
 php artisan migrate:fresh
 
 
+########################################
+#    Docker - PostgreSQL Database      #
+########################################
 
+# Ejecutar Contenedor de PostgreSQL (Versión 15)
 docker run --name technosystem-shop \
   -e POSTGRES_USER=techuser \
   -e POSTGRES_PASSWORD=techuser123 \
   -e POSTGRES_DB=technosystemdb \
   -p 5432:5432 \
   -d postgres:15
+
+
+########################################
+#    Configuración JWT (tymon/jwt-auth)  #
+########################################
+
+# 1. Instalar paquete
+composer require tymon/jwt-auth
+
+# 2. Publicar configuración (Crea config/jwt.php)
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+
+# 3. Generar clave secreta (Para método Simétrico: Actualiza .env JWT_SECRET)
+php artisan jwt:secret
+
+# Comandos de Soporte para RSA (Asimétrico)
+
+# Comando si se usa el paquete PHP-Open-Source-Saver/jwt-auth y falla la generación
+# OPENSSL_CONF=/etc/ssl/openssl.cnf php artisan jwt:generate-certs --force --algo=rsa --bits=4096 --sha=512
+
+# Generar par de claves RSA manualmente (Método Asimétrico RS256)
+
+# Generar clave privada
+openssl genrsa -out storage/jwt/private.key 2048
+
+# Generar clave pública desde la privada
+openssl rsa -in storage/jwt/private.key -pubout -out storage/jwt/public.key
+
+# Dar permisos adecuados (Importante por seguridad)
+chmod 600 storage/jwt/private.key
+chmod 644 storage/jwt/public.key
+
+
+########################################
+#      Variables .env para JWT (RSA)     #
+########################################
+
+# Algoritmo RS256 (Asimétrico)
+JWT_ALGORITHM=RS256
+JWT_SECRET=null
+
+# Rutas locales a las claves
+JWT_PRIVATE_KEY=storage/jwt/private.key
+JWT_PUBLIC_KEY=storage/jwt/public.key
+
+# Tiempos (en minutos)
+JWT_TTL=60
+JWT_REFRESH_TTL=20160
+
+
+links
+https://dev.to/germanlozickyj/how-to-implement-jwt-in-laravel-api-4590

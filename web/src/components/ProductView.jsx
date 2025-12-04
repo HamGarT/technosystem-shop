@@ -262,7 +262,7 @@ const ProductView = () => {
             </div>
 
             <div className="flex items-center space-x-4 mb-6">
-              <div className="flex items-center bg-gray-100 border border-gray-500 rounded-md">
+              <div className="flex items-center  border border-gray-500 rounded-md">
                 <button
                   onClick={() => handleQuantityChange(-1)}
                   disabled={quantity <= 1}

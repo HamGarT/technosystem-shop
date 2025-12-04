@@ -1,8 +1,24 @@
 import axios from 'axios';
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useCart from '../../contexts/useCart';
 import { useNotification } from '../../hooks/useNotification';
+import GraphicCard from '@/assets/images/graphiccard.png'
+import { Search, SlidersHorizontal, Menu, ArrowUpDown, DollarSign, X } from "lucide-react"
+
+const apiUrl = import.meta.env.VITE_API_URL;
+const sortOptions = [
+  { id: "name-asc", label: "Nombre Ascendente" },
+  { id: "name-desc", label: "Nombre Descendente" },
+  { id: "price-desc", label: "Mayor a menor precio" },
+  { id: "price-asc", label: "Menor a mayor precio" },
+]
+
+const categories = [
+  { name: "Laptops", count: 42 },
+  { name: "Teclados", count: 12 },
+  { name: "Procesadores", count: 100 },
+]
 
 const ConfirmationModal = ({ isOpen, onClose, product, quantity, onContinueShopping, onGoToCart }) => {
 
@@ -83,13 +99,14 @@ const ConfirmationModal = ({ isOpen, onClose, product, quantity, onContinueShopp
 };
 
 const TiendaLista = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
+
   const [filters, setFilters] = useState({
-    category: '',
-    priceRange: '',
-    brand: '',
-    inStock: false
-  });
+    categories: [],
+    priceMin: 0,
+    priceMax: 5000,
+    sortBy: "name-asc",
+    search: "",
+  })
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,22 +119,295 @@ const TiendaLista = () => {
   const { addItem } = useCart();
   const { showSuccess, showError } = useNotification();
 
+  const [searchParams] = useSearchParams();
+  const name = searchParams.get('name') || '';
+  const categoria = searchParams.get('categoria') || '';
+
   useEffect(() => {
     setLoading(true);
-    axios.get(`${apiUrl}/api/products`)
-      .then((response) => {
-        console.log('Respuesta de la API:', response);
-        setProducts(response.data.data);
-        setError(null);
+    setError(null);
+
+    // Check if there are any search parameters
+    const hasSearchParams = name || categoria;
+
+    if (!hasSearchParams) {
+      // No search params - fetch all products
+      axios.get(`${apiUrl}/api/products`)
+        .then((response) => {
+          console.log('Respuesta de la API:', response);
+          setProducts(response.data.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+          setError("No se pudieron cargar los productos. Por favor, intenta nuevamente.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      // Has search params - search products
+      axios.get(`${apiUrl}/api/products/search`, {
+        params: {
+          name: name || undefined,
+          categoria: categoria || undefined
+        }
       })
-      .catch((error) => {
-        console.error("Error fetching products:", error);
-        setError("No se pudieron cargar los productos. Por favor, intenta nuevamente.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+        .then((response) => {
+          console.log('Search results:', response);
+          setProducts(response.data.data);
+        })
+        .catch((error) => {
+          console.error("Error searching products:", error);
+          setError("Error al buscar productos. Por favor, intenta nuevamente.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+
+  }, [name, categoria]);
+
+  const activeFilterTags = useMemo(() => {
+    const tags = []
+
+    filters.categories.forEach((cat) => {
+      tags.push({ label: cat, key: `cat-${cat}` })
+    })
+
+    if (filters.priceMin > 0 || filters.priceMax < 5000) {
+      tags.push({ label: `S/. ${filters.priceMin}-${filters.priceMax}`, key: "price" })
+    }
+
+    if (filters.search) {
+      tags.push({ label: filters.search, key: "search" })
+    }
+
+    return tags
+  }, [filters]);
+
+
+  const removeFilterTag = (key) => {
+    if (key.startsWith("cat-")) {
+      const category = key.replace("cat-", "")
+      setFilters((prev) => ({
+        ...prev,
+        categories: prev.categories.filter((c) => c !== category),
+      }))
+    } else if (key === "price") {
+      setFilters((prev) => ({ ...prev, priceMin: 0, priceMax: 5000 }))
+    } else if (key === "search") {
+      setFilters((prev) => ({ ...prev, search: "" }))
+    }
+  }
+
+  const handleCategoryChange = (category) => {
+    setFilters((prev) => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter((c) => c !== category)
+        : [...prev.categories, category],
+    }))
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      categories: [],
+      priceMin: 0,
+      priceMax: 5000,
+      sortBy: "name-asc",
+      search: "",
+    })
+  }
+
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    const result = products.filter((product) => {
+      const matchesCategory = filters.categories.length === 0 || filters.categories.includes(product.categoria)
+      const matchesPrice = product.precio >= filters.priceMin && product.precio <= filters.priceMax
+      const matchesSearch =
+        filters.search === "" ||
+        product.nombre.toLowerCase().includes(filters.search.toLowerCase()) ||
+        product.descripcion.toLowerCase().includes(filters.search.toLowerCase())
+
+      return matchesCategory && matchesPrice && matchesSearch
+    })
+
+    // Sort
+    switch (filters.sortBy) {
+      case "name-asc":
+        result.sort((a, b) => a.nombre.localeCompare(b.nombre))
+        break
+      case "name-desc":
+        result.sort((a, b) => b.nombre.localeCompare(a.nombre))
+        break
+      case "price-asc":
+        result.sort((a, b) => a.precio - b.precio)
+        break
+      case "price-desc":
+        result.sort((a, b) => b.precio - a.precio)
+        break
+    }
+
+    return result
+  }, [products, filters])
+
+
+  const FilterPanel = () => (
+    <div className="bg-background rounded-2xl shadow-lg p-6 ">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-5">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="w-5 h-5 text-foreground" />
+          <h2 className="text-xl font-semibold text-foreground">Filtros</h2>
+        </div>
+        <button
+          onClick={clearFilters}
+          className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+        >
+          Limpiar
+        </button>
+      </div>
+
+      {/* Active Filter Tags */}
+      {activeFilterTags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {activeFilterTags.map((tag) => (
+            <span
+              key={tag.key}
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-200 text-foreground rounded-full text-sm font-medium"
+            >
+              {tag.label}
+              <button onClick={() => removeFilterTag(tag.key)} className="ml-1 hover:text-primary transition-colors">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Search */}
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Buscar productos"
+          value={filters.search}
+          onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all bg-background text-foreground placeholder:text-muted-foreground"
+        />
+      </div>
+
+      {/* Categories */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Menu className="w-5 h-5 text-foreground" />
+          <h3 className="font-semibold text-lg text-foreground">Categorías</h3>
+        </div>
+        <div className="h-px bg-border mb-4" />
+        <div className="space-y-3">
+          {categories.map((category) => (
+            <label key={category.name} className="flex items-center justify-between cursor-pointer group">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={filters.categories.includes(category.name)}
+                    onChange={() => handleCategoryChange(category.name)}
+                    className="peer sr-only"
+                  />
+                  <div className="w-5 h-5 border-2 border-border rounded-md peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center">
+                    {filters.categories.includes(category.name) && (
+                      <svg
+                        className="w-3 h-3 text-primary-foreground"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className="text-foreground group-hover:text-primary transition-colors">{category.name}</span>
+              </div>
+              <span className="text-sm text-muted-foreground bg-gray-200 rounded-full px-2 py-0.5">
+                {category.count}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Sort */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <ArrowUpDown className="w-5 h-5 text-foreground" />
+          <h3 className="font-semibold text-lg text-foreground">Ordenar por</h3>
+        </div>
+        <div className="h-px bg-border mb-4" />
+        <div className="space-y-3">
+          {sortOptions.map((option) => (
+            <label key={option.id} className="flex items-center gap-3 cursor-pointer group">
+              <div className="relative">
+                <input
+                  type="radio"
+                  name="sortBy"
+                  value={option.id}
+                  checked={filters.sortBy === option.id}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, sortBy: e.target.value }))}
+                  className="peer sr-only"
+                />
+                <div className="w-5 h-5 border-2 border-border rounded-md peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center">
+                  {filters.sortBy === option.id && (
+                    <svg
+                      className="w-3 h-3 text-primary-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className="text-foreground group-hover:text-primary transition-colors">{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <DollarSign className="w-5 h-5 text-foreground" />
+          <h3 className="font-semibold text-lg text-foreground">Rango de precio</h3>
+        </div>
+        <div className="px-1">
+          <input
+            type="range"
+            min="0"
+            max="12000"
+            step="100"
+            value={filters.priceMax}
+            onChange={(e) => setFilters((prev) => ({ ...prev, priceMax: Number.parseInt(e.target.value) }))}
+            className="w-full h-2 bg-muted rounded-lg  cursor-pointer accent-primary border-none"
+          />
+          <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+            <span>S/. {filters.priceMin}</span>
+            <span>S/. {filters.priceMax}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Apply Button */}
+      <button
+        onClick={() => setMobileFiltersOpen(false)}
+        className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors"
+      >
+        Aplicar Filtros
+      </button>
+    </div>
+  )
 
   const handleAddToCart = (product) => {
     const success = addItem(product);
@@ -154,42 +444,7 @@ const TiendaLista = () => {
     }));
   };
 
-  const clearFilters = () => {
-    setFilters({
-      category: '',
-      priceRange: '',
-      brand: '',
-      inStock: false
-    });
-  };
 
-  // Filtrar productos basado en los filtros seleccionados
-  const filteredProducts = useMemo(() => {
-    return products.filter(product => {
-      const matchesCategory = filters.category === '' || product.categoria === filters.category;
-      const matchesBrand = filters.brand === '' || product.marca === filters.brand;
-      const matchesStock = !filters.inStock || product.stock > 0;
-
-      let matchesPrice = true;
-      if (filters.priceRange !== '') {
-        switch (filters.priceRange) {
-          case 'low':
-            matchesPrice = product.precio < 1000;
-            break;
-          case 'medium':
-            matchesPrice = product.precio >= 1000 && product.precio < 1500;
-            break;
-          case 'high':
-            matchesPrice = product.precio >= 1500;
-            break;
-          default:
-            matchesPrice = true;
-        }
-      }
-
-      return matchesCategory && matchesBrand && matchesStock && matchesPrice;
-    });
-  }, [products, filters]);
 
   // Función para manejar errores de imagen
   const handleImageError = (e) => {
@@ -234,92 +489,17 @@ const TiendaLista = () => {
         onGoToCart={handleGoToCart}
       />
 
-      <div className='flex flex-2 justify-between gap-8 bg-gray-300'>
-        <h1 className="text-5xl p-12 font-bold text-gray-900 m-2">
+      <div className='flex flex-2 justify-between gap-8 bg-gray-200'>
+        <h1 className="text-[88px] p-12  text-gray-900 m-2">
           EXPLORA TODOS <br /> NUESTROS PRODUCTOS
         </h1>
-        <img src="/images/laptop.png" alt="Laptop" className="w-70 h-70 m-4 p-3 object-contain" />
+        <img src={GraphicCard} alt="Laptop" className="h-[350px]" />
       </div>
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Panel de Filtros */}
           <div className="lg:w-1/4 order-2 lg:order-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">Filtros</h2>
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Limpiar
-                </button>
-              </div>
-
-              {/* Filtro por Categoría */}
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-3">Categoría</h3>
-                <select
-                  value={filters.category}
-                  onChange={(e) => handleFilterChange('category', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                >
-                  <option value="">Todas las categorías</option>
-                  <option value="laptops">Laptops</option>
-                  <option value="smartphones">Smartphones</option>
-                  <option value="tablets">Tablets</option>
-                  <option value="accesorios">Accesorios</option>
-                </select>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-3">Marca</h3>
-                <select
-                  value={filters.brand}
-                  onChange={(e) => handleFilterChange('brand', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                >
-                  <option value="">Todas las marcas</option>
-                  <option value="Apple">Apple</option>
-                  <option value="Dell">Dell</option>
-                  <option value="ASUS">ASUS</option>
-                  <option value="Samsung">Samsung</option>
-                  <option value="HP">HP</option>
-                  <option value="Lenovo">Lenovo</option>
-                </select>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-3">Rango de Precio</h3>
-                <select
-                  value={filters.priceRange}
-                  onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                >
-                  <option value="">Todos los precios</option>
-                  <option value="low">Menos de $1000</option>
-                  <option value="medium">$1000 - $1500</option>
-                  <option value="high">Más de $1500</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={filters.inStock}
-                    onChange={(e) => handleFilterChange('inStock', e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-gray-700">Solo productos en stock</span>
-                </label>
-              </div>
-
-              <div className="lg:hidden mt-4 pt-4 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-            </div>
+            <FilterPanel/>
           </div>
 
           {/* Lista de Productos */}
@@ -339,7 +519,7 @@ const TiendaLista = () => {
                   key={product.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:translate-y-[-4px]"
                 >
-                  <div className='p-3 bg-gray-50 border-b'>
+                  <div className='p-3 bg-gray-50  border-b-gray-200 border-b'>
                     <span className='text-sm font-medium text-gray-600 uppercase tracking-wide'>
                       {product.categoria}
                     </span>
@@ -348,7 +528,7 @@ const TiendaLista = () => {
                     <img
                       src={product.imagen || product.image_url || "/images/placeholder.jpg"}
                       alt={product.nombre}
-                      className="w-full rounded-lg h-48 object-cover mb-4"
+                      className="w-full rounded-lg h-48 object-contain mb-4"
                       onError={handleImageError}
                     />
                     <div className="flex justify-between items-start mb-2">
@@ -356,8 +536,8 @@ const TiendaLista = () => {
                         {product.nombre}
                       </h3>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium min-w-[80px] text-center ${product.stock > 0
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
                         }`}>
                         {product.stock > 0 ? `En stock (${product.stock})` : 'Agotado'}
                       </span>
@@ -367,14 +547,14 @@ const TiendaLista = () => {
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-bold text-gray-900">
-                        ${product.precio?.toLocaleString() || '0'}
+                        S/ {product.precio?.toLocaleString() || '0'}
                       </span>
                       <button
                         onClick={() => handleAddToCart(product)}
                         disabled={product.stock <= 0}
                         className={`px-4 py-2 rounded-md font-medium transition-colors ${product.stock > 0
-                            ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           }`}
                       >
                         {product.stock > 0 ? 'Agregar al carrito' : 'Agotado'}
