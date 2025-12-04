@@ -171,7 +171,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
 
                             <div className="mt-4 flex gap-2 ">
                                 <div
-                                    className={`h-1 flex-1 rounded-full transition-all ${step !== "email" ? "bg-blue-600" : "bg-blue-600"}`}
+                                    className={`h-1 flex-1 rounded-full transition-all ${step !== "email" ? "bg-blue-600" : "bg-blue-200"}`}
                                 />
                                 <div
                                     className={`h-1 flex-1 rounded-full transition-all ${["otp", "password", "register"].includes(step) ? "bg-blue-600" : "bg-slate-200"}`}
@@ -225,7 +225,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                             <button
                                 type="submit"
                                 disabled={loading || !email}
-                                className="w-full h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
+                                className="w-full h-12 bg-blue-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
                             >
                                 {loading ? (
                                     <>

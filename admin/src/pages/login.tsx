@@ -38,7 +38,7 @@ export default function Login() {
                             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mb-4">
                                 <div className="text-white font-bold text-xl">A</div>
                             </div>
-                            <h1 className="text-3xl font-bold text-foreground mb-2">Admin</h1>
+                            <h1 className="text-3xl font-bold text-foreground mb-2">TECHNOSYSTEM</h1>
                             <p className="text-muted-foreground text-sm">Accede a tu panel de control</p>
                         </div>
 

@@ -5,14 +5,18 @@ import CartItem from '../components/CartItem';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginForm } from '../components/login-form';
+import { initMercadoPago, Wallet, Payment } from '@mercadopago/sdk-react';
 
 const currencyFormat = (v) => Number(v).toFixed(2);
-
+initMercadoPago(import.meta.env.VITE_MERCADO_PAGO_PUBLIC_KEY, {
+  locale: 'es-PE'  // Español de Perú
+});
 export default function Cart() {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const { user, isAuthenticated, token } = useAuth();
   const { cart, updateQuantity, removeItem, clearCart } = useCart();
+  const [preferenceId, setPreferenceId] = useState(null);
   const [order, setOrder] = useState({
     departamento: "Lima",
     provincia: "Lima",
@@ -30,9 +34,6 @@ export default function Cart() {
       ...prev,
       pedido_items
     }));
-
-    console.log(pedido_items);
-    console.log(order);
   }, [cart]);
 
   useEffect(() => {
@@ -51,7 +52,35 @@ export default function Cart() {
 
   const handleCheckout = async () => {
     setIsLoading(true);
+    // try {
+    //   if (!isAuthenticated) {
+    //     setIsLoginOpen(true);
+    //     return;
+    //   }
+
+    //   const newOrder = {
+    //     ...order,
+    //     usuario_id: user.id
+    //   };
+
+    //   console.log(newOrder);
+    //   console.log(token)
+    //   await axios.post(`${apiUrl}/api/pedidos`, newOrder, {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //       'Content-Type': 'application/json'
+    //     }
+    //   });
+    //   alert('¡Pedido registrado correctamente!');
+    // } catch (error) {
+    //   const message = error.response?.data?.message || 'Error al registrar el pedido';
+    //   alert(`Error: ${message}`);
+    // } finally {
+    //   setIsLoading(false);
+    // }
+
     try {
+
       if (!isAuthenticated) {
         setIsLoginOpen(true);
         return;
@@ -61,19 +90,26 @@ export default function Cart() {
         ...order,
         usuario_id: user.id
       };
+    
+      const response = await axios.post(`${apiUrl}/api/payment/create-preference`, newOrder);
 
-      console.log(newOrder);
-      console.log(token)
-      await axios.post(`${apiUrl}/api/pedidos`, newOrder, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      alert('¡Pedido registrado correctamente!');
+      const preference = response.data;
+
+      if (preference.error) {
+        throw new Error(preference.error);
+      }
+
+      console.log('Respuesta de la preferencia:', preference);
+      setPreferenceId(preference.id);
+
     } catch (error) {
-      const message = error.response?.data?.message || 'Error al registrar el pedido';
-      alert(`Error: ${message}`);
+      console.error('Error al crear la preferencia:', error);
+      // Swal.fire({
+      //   title: 'Error!',
+      //   text: 'Hubo un problema al procesar tu pedido.',
+      //   icon: 'error',
+      //   confirmButtonText: 'Aceptar'
+      // });
     } finally {
       setIsLoading(false);
     }
@@ -127,6 +163,25 @@ export default function Cart() {
         </aside>
       </div>
       <LoginForm isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      {preferenceId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md relative">
+            <button
+              onClick={() => setPreferenceId(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ×
+            </button>
+
+            <h3 className="text-lg font-bold mb-4">Completa tu pago</h3>
+
+            <Wallet
+              initialization={{ preferenceId: preferenceId }}
+              customization={{ texts: { valueProp: 'smart_option' } }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

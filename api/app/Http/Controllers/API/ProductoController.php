@@ -17,12 +17,12 @@ class ProductoController extends Controller
 
     public function index()
     {
-        $productos = Producto::with('categoria')->paginate(15);                
+        $productos = Producto::with('categoria')->paginate(15);
         return ProductoResource::collection($productos);
     }
 
     public function show($id)
-    { 
+    {
         $producto = Producto::with('categoria')->find($id);
         if ($producto) {
             return new ProductoResource($producto);
@@ -56,51 +56,53 @@ class ProductoController extends Controller
     }
 
 
-public function delete($id){
-    try{
-        $producto = Producto::findOrFail($id);
-        $producto->delete();
-        return response()->json([
-            'message'=> 'Product successfully deleted'
-        ]);
-        
-    } catch (ModelNotFoundException $e) {
-        return response()->json([
-            'message' => 'Product not found'
-        ], 404);
-    } catch (\Exception $e){
-        return response()->json([
-            'message' => 'Failed to delete product',
-            'error' => 'Internal server error'
-        ], 500);
-    }
-}
+    public function delete($id)
+    {
+        try {
+            $producto = Producto::findOrFail($id);
+            $producto->delete();
+            return response()->json([
+                'message' => 'Product successfully deleted'
+            ]);
 
-public function update($id, StoreProductoRequest $request){
-    try{
-        
-        $data = $request->validated();
-        $producto = Producto::findOrFail($id);
-        $producto->update($data);
-        $photoUrl = $this->handleProductPhotoUpload($request, $producto->id);
-        if ($photoUrl) {
-            $producto->update(['image_url'=> $photoUrl]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Product not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete product',
+                'error' => 'Internal server error'
+            ], 500);
         }
-        return (new ProductoResource($producto))
-            ->response()
-            ->setStatusCode(200);
-            
-    } catch (ModelNotFoundException $e) {
-        return response()->json([
-            'message' => 'Product not found'
-        ], 404);
-    } catch (\Exception $e){
-        return response()->json([
-            'message' => 'Failed to update product',
-            'error' => 'Internal server error'
-        ], 500);
     }
-}
+
+    public function update($id, StoreProductoRequest $request)
+    {
+        try {
+
+            $data = $request->validated();
+            $producto = Producto::findOrFail($id);
+            $producto->update($data);
+            $photoUrl = $this->handleProductPhotoUpload($request, $producto->id);
+            if ($photoUrl) {
+                $producto->update(['image_url' => $photoUrl]);
+            }
+            return (new ProductoResource($producto))
+                ->response()
+                ->setStatusCode(200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Product not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update product',
+                'error' => 'Internal server error'
+            ], 500);
+        }
+    }
 
 
     private function handleProductPhotoUpload(Request $request, $productId)
@@ -108,7 +110,7 @@ public function update($id, StoreProductoRequest $request){
         if (!$request->hasFile('image')) {
             return null;
         }
-        
+
         $request->validate([
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:4048',
         ]);
@@ -122,8 +124,29 @@ public function update($id, StoreProductoRequest $request){
             $filename,
             'public'
         );
-        return Storage::url($path); ;
+        return Storage::url($path);
+        ;
     }
 
-  
+    public function search(Request $request)
+    {
+        $query = Producto::with('categoria');
+
+        if ($request->has('name') && $request->name) {
+            $query->where('nombre', 'ILIKE', '%' . $request->name . '%');
+        }
+
+    
+        if ($request->has('categoria') && $request->categoria) {
+            $query->whereHas('categoria', function ($q) use ($request) {
+                $q->where('nombre', 'ILIKE', '%' . $request->categoria . '%');
+            });
+        }
+
+        $productos = $query->paginate(15);
+
+        return ProductoResource::collection($productos);
+    }
+
+
 }

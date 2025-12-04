@@ -9,6 +9,7 @@ import axios from "axios"
 
 
 import { toast as toastsonner } from "sonner"
+import { useAuth } from "@/context/AuthContext"
 
 interface Product {
   id: number
@@ -23,6 +24,7 @@ interface Product {
 
 export function Products() {
   const apiUrl = import.meta.env.VITE_API_URL;
+  const { token } = useAuth();
   const [products, setProducts] = useState<Product[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -64,7 +66,7 @@ export function Products() {
             setProducts(products.filter((p) => p.id !== idProducto));
           } catch (error) {
             console.error("Error al eliminar producto:", error);
-            toastsonner.error( "Error al eliminar el producto");
+            toastsonner.error("Error al eliminar el producto");
           } finally {
             setIsDeleting(false);
           }
@@ -78,7 +80,13 @@ export function Products() {
     if (editingId) {
       console.log(product)
       try {
-        await axios.put(`${apiUrl}/api/products/${editingId}`, product);
+        await axios.put(`${apiUrl}/api/products/${editingId}`, product,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
         toastsonner.success("Producto actualizado correctamente");
         setProducts(products.map((p) => (p.id === editingId ? { ...product, id: editingId } : p)))
       } catch (e) {
@@ -88,7 +96,13 @@ export function Products() {
       setEditingId(null)
     } else {
       try {
-        const response = await axios.post(`${apiUrl}/api/products`, product);
+        const response = await axios.post(`${apiUrl}/api/products`, product,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
         setProducts([...products, response.data.data]);
         toastsonner.success("Producto registrado correctamente");
       } catch (error) {

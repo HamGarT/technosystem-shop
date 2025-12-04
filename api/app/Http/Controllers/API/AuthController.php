@@ -135,7 +135,6 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         try {
-            // Use JWTAuth::attempt() instead of auth('api')->attempt()
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'success' => false,
@@ -153,9 +152,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Get the authenticated user
-     */
     public function me(Request $request)
     {
         try {
@@ -247,7 +243,7 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        $ttl = (int) config('jwt.ttl', 60);  // ✅ Cast to int
+        $ttl = (int) config('jwt.ttl', 60);
         $user = auth('api')->user();
         return response()->json([
             'success' => true,

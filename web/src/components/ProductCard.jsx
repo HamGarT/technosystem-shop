@@ -12,11 +12,9 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 text-left h-full flex flex-col w-full hover:shadow-lg transition-shadow duration-300">
-      {/* --- Parte Superior: Etiqueta e Íconos --- */}
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 text-left h-full flex flex-col w-full hover:shadow-lg transition-shadow duration-300 min-h-[376px]">
       <div className="flex justify-between items-center mb-3">
         <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded uppercase">
-          {/* Usamos el dato de la API */}
           {product.categoria} 
         </span>
         <div className="flex items-center space-x-2 text-gray-400">
@@ -24,25 +22,23 @@ const ProductCard = ({ product }) => {
           <button className="hover:text-blue-500"><FiEye size={20} /></button>
         </div>
       </div>
-
-      {/* --- Imagen del Producto --- */}
       <div className="flex-shrink-0 my-4 h-40 flex items-center justify-center">
         <img 
-          src={product.image_url}  /* <-- CAMBIO AQUÍ */
-          alt={product.nombre}     /* <-- CAMBIO AQUÍ */
+          src={product.image_url}  
+          alt={product.nombre}    
           className="max-h-full max-w-full object-contain" 
         />
       </div>
 
-      {/* --- Título del Producto --- */}
+     
       <h3 className="text-sm font-semibold text-gray-800 flex-grow mb-4 leading-tight">
-        {product.nombre} {/* <-- CAMBIO AQUÍ */}
+        {product.nombre} 
       </h3>
 
-      {/* --- Parte Inferior: Precio e Ícono de Carrito --- */}
+     
       <div className="flex justify-between items-center mt-auto">
         <span className="text-xl font-bold text-gray-900">
-          S/. {product.precio} {/* <-- CAMBIO AQUÍ */}
+          S/. {product.precio} 
         </span>
         <button onClick={handleAdd} className="text-gray-600 hover:text-blue-600">
           <FiShoppingCart size={24} />

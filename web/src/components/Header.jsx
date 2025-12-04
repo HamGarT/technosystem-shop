@@ -3,6 +3,7 @@ import { FiPhoneCall, FiMenu, FiSearch, FiUser, FiShoppingCart, FiLogOut } from 
 import { useState } from 'react';
 import { LoginForm } from './login-form';
 import { useAuth } from '../contexts/AuthContext';
+import { SearchBar } from './search-bar';
 
 
 const Header = () => {
@@ -63,19 +64,7 @@ const Header = () => {
             </div>
           </div>
           <div className="flex-grow max-w-3xl">
-            <div className="flex bg-white rounded-md overflow-hidden h-[43px]">
-              <div className="w-[150px] px-4 py-2 text-gray-500 border-r border-gray-200">
-                All categorias▾
-              </div>
-              <input
-                type="text"
-                placeholder="Ingresar producto a buscar"
-                className="p-2 text-gray-800 focus:outline-none w-full"
-              />
-              <button className="px-4 text-gray-600 bg-gray-100 hover:bg-gray-200 items-end">
-                <FiSearch size={20} />
-              </button>
-            </div>
+            <SearchBar/>
           </div>
           <div className="flex items-center space-x-6">
             {isAuthenticated ? (
