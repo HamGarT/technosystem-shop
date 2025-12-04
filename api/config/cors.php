@@ -20,10 +20,7 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'https://perpetual-inspiration-production.up.railway.app',
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'https://admin-frontend-production-ae6c.up.railway.app'
+        '*'
     ],
 
     'allowed_origins_patterns' => [],
