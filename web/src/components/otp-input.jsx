@@ -1,16 +1,9 @@
-import type React from "react"
 import { useRef } from "react"
 
-interface OtpInputProps {
-  value: string
-  onChange: (value: string) => void
-  length?: number
-}
+export function OtpInput({ value, onChange, length = 6 }) {
+  const inputRefs = useRef([])
 
-export function OtpInput({ value, onChange, length = 6 }: OtpInputProps) {
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([])
-
-  const handleChange = (index: number, char: string) => {
+  const handleChange = (index, char) => {
     if (!/^[0-9]*$/.test(char)) return
 
     const newValue = value.split("")
@@ -19,17 +12,17 @@ export function OtpInput({ value, onChange, length = 6 }: OtpInputProps) {
     onChange(result)
 
     if (char && index < length - 1) {
-      inputRefs.current[index + 1]?.focus()
+      inputRefs.current[index + 1]?. focus()
     }
   }
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !value[index] && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }
   }
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (e) => {
     e.preventDefault()
     const paste = e.clipboardData
       .getData("text")
@@ -46,7 +39,7 @@ export function OtpInput({ value, onChange, length = 6 }: OtpInputProps) {
 
   return (
     <div className="flex gap-2 justify-center">
-      {Array.from({ length }).map((_, index) => (
+      {Array.from({ length }). map((_, index) => (
         <input
           key={index}
           ref={(el) => {
@@ -56,7 +49,7 @@ export function OtpInput({ value, onChange, length = 6 }: OtpInputProps) {
           inputMode="numeric"
           maxLength={1}
           value={value[index] || ""}
-          onChange={(e) => handleChange(index, e.target.value)}
+          onChange={(e) => handleChange(index, e. target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
           className="w-12 h-14 text-center text-2xl font-semibold border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 bg-slate-50 focus:bg-white transition-all"

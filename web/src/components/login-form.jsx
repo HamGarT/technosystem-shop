@@ -1,18 +1,12 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
 import { Mail, Lock, CheckCircle2, ArrowRight, User, Eye, EyeOff, X } from "lucide-react"
 import { OtpInput } from "./otp-input"
 import axios from "axios"
 import { useAuth } from "../contexts/AuthContext"
 
-interface LoginFormProps {
-    isOpen: boolean
-    onClose: () => void
-}
-
-export function LoginForm({ isOpen, onClose }: LoginFormProps) {
+export function LoginForm({ isOpen, onClose }) {
     const {
         user,
         loading,
@@ -26,7 +20,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
         clearError,
         verifyOtp
     } = useAuth();
-    const [step, setStep] = useState<"email" | "otp" | "password" | "register">("email")
+    const [step, setStep] = useState("email")
     const [email, setEmail] = useState("")
     const [otp, setOtp] = useState("")
     const [password, setPassword] = useState("")
@@ -46,7 +40,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
 
   
 
-    const handleEmailSubmit = async (e: React.FormEvent) => {
+    const handleEmailSubmit = async (e) => {
         e.preventDefault();
         clearError();
         try {
@@ -59,7 +53,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
         }
     };
 
-    const handleOtpSubmit = async (e: React.FormEvent) => {
+    const handleOtpSubmit = async (e) => {
         e.preventDefault();
         clearError();
         try {
@@ -70,7 +64,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
         }
     };
 
-    const handlePasswordSubmit = async (e: React.FormEvent) => {
+    const handlePasswordSubmit = async (e) => {
         e.preventDefault();
         clearError();
         try {
@@ -84,7 +78,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
         }
     };
 
-    const handleRegisterSubmit = async (e: React.FormEvent) => {
+    const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         clearError();
         try {
@@ -92,7 +86,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
             console.log("Registro exitoso");
             setSuccess(true);
         } catch (err) {
-            console.log(err)
+            console. log(err)
         }
     };
 
@@ -123,7 +117,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
 
     const formContent = (
         <>
-            {success ? (
+            {success ?  (
                 <div className="w-full max-w-md">
                     <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-12 border border-white/20 text-center">
                         <div className="mb-6">
@@ -138,7 +132,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                             <p className="text-slate-600 mb-1">
                                 {emailExists ? "Has iniciado sesión correctamente" : "Tu cuenta ha sido creada exitosamente"}
                             </p>
-                            {!emailExists && (
+                            {! emailExists && (
                                 <p className="text-sm text-slate-500">
                                     Hola {firstName} {lastName}
                                 </p>
@@ -325,10 +319,10 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                                 disabled={loading || !password}
                                 className="w-full h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group flex items-center justify-center gap-2"
                             >
-                                {loading ? (
+                                {loading ?  (
                                     <>
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Iniciando sesión...
+                                        Iniciando sesión... 
                                     </>
                                 ) : (
                                     <>
@@ -363,7 +357,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                                             placeholder="Juan"
                                             value={firstName}
                                             onChange={(e) => {
-                                                setFirstName(e.target.value)
+                                                setFirstName(e. target.value)
                                                 // // setError("")
                                             }}
                                             required
@@ -384,7 +378,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                                             placeholder="Pérez"
                                             value={lastName}
                                             onChange={(e) => {
-                                                setLastName(e.target.value)
+                                                setLastName(e. target.value)
                                                 // // setError("")
                                             }}
                                             required
@@ -406,7 +400,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                                         placeholder="Mínimo 8 caracteres"
                                         value={registerPassword}
                                         onChange={(e) => {
-                                            setRegisterPassword(e.target.value)
+                                            setRegisterPassword(e.target. value)
                                             // // setError("")
                                         }}
                                         required
@@ -449,10 +443,10 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                                     />
                                     <button
                                         type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        onClick={() => setShowConfirmPassword(! showConfirmPassword)}
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                                     >
-                                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        {showConfirmPassword ?  <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                     </button>
                                 </div>
                                 {confirmPassword && registerPassword !== confirmPassword && (
@@ -473,7 +467,7 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
                                 type="submit"
                                 disabled={
                                     loading ||
-                                    !firstName ||
+                                    ! firstName ||
                                     !lastName ||
                                     registerPassword.length < 8 ||
                                     registerPassword !== confirmPassword
@@ -518,13 +512,13 @@ export function LoginForm({ isOpen, onClose }: LoginFormProps) {
         </>
     )
 
-    if (!isOpen) return null
+    if (! isOpen) return null
 
     return (
         <div
             className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm transition-all duration-300"
             onClick={(e) => {
-                if (e.target === e.currentTarget) {
+                if (e.target === e. currentTarget) {
                     closeModal()
                 }
             }}
